@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import setAuthToken from '../utils/setAuthToken';
+import setAuthToken from '../utils/setAuthToken.ts';
+import { Project } from '../types';
 
-const ProjectDetailsPage = () => {
-    const { id } = useParams();
-    const [project, setProject] = useState(null);
+const ProjectDetailsPage: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
+    const [project, setProject] = useState<Project | null>(null);
     const [proposal, setProposal] = useState('');
     const [isFreelancer, setIsFreelancer] = useState(false);
 
     useEffect(() => {
         const fetchProject = async () => {
             try {
-                const res = await axios.get(`/api/projects/${id}`);
+                const res = await axios.get<Project>(`/api/projects/${id}`);
                 setProject(res.data);
             } catch (err) {
                 console.error(err);
@@ -20,13 +21,10 @@ const ProjectDetailsPage = () => {
         };
         fetchProject();
 
-        // This is a simplified way to check user type.
-        // In a real app, this would come from a global state/context.
         if (localStorage.token) {
             setAuthToken(localStorage.token);
-            // We don't have the user object here, so we can't check the userType.
-            // For now, we'll assume if the user is logged in, they might be a freelancer.
-            // The backend will handle the authorization.
+            // This is still a simplification. A proper implementation
+            // would involve a global user context.
             setIsFreelancer(true);
         }
 
@@ -36,7 +34,7 @@ const ProjectDetailsPage = () => {
         try {
             await axios.post(`/api/applications/project/${id}`, { proposal });
             alert('Application submitted!');
-        } catch (err) {
+        } catch (err: any) {
             console.error(err.response.data);
             alert('Error submitting application: ' + err.response.data.msg);
         }
@@ -57,7 +55,7 @@ const ProjectDetailsPage = () => {
                     <textarea
                         placeholder="Your proposal"
                         value={proposal}
-                        onChange={e => setProposal(e.target.value)}
+                        onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setProposal(e.target.value)}
                     />
                     <button onClick={handleApply}>Apply</button>
                 </div>

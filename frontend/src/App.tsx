@@ -11,7 +11,7 @@ import ProjectDetailsPage from './components/ProjectDetailsPage';
 import PrivateRoute from './components/PrivateRoute';
 import './App.css';
 
-function App() {
+const App: React.FC = () => {
   return (
     <Router>
       <div className="App">

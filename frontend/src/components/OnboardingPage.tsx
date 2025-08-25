@@ -1,15 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import axios from 'axios';
-import setAuthToken from '../utils/setAuthToken';
+import setAuthToken from '../utils/setAuthToken.ts';
 import { useNavigate } from 'react-router-dom';
 
-const OnboardingPage = () => {
+interface FormData {
+  phone: string;
+  dob: string;
+  location: string;
+  userSpecificType: 'digital' | 'artisan' | '';
+  nin: string;
+  bvn: string;
+  driversLicense: string;
+}
+
+const OnboardingPage: React.FC = () => {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     phone: '',
     dob: '',
     location: '',
-    userSpecificType: '', // 'digital' or 'artisan'
+    userSpecificType: '',
     nin: '',
     bvn: '',
     driversLicense: '',
@@ -18,7 +28,7 @@ const OnboardingPage = () => {
 
   const { phone, dob, location, userSpecificType, nin, bvn, driversLicense } = formData;
 
-  const onChange = e =>
+  const onChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const nextStep = () => {
@@ -35,8 +45,8 @@ const OnboardingPage = () => {
     }
     try {
       await axios.put('/api/users/onboarding', formData);
-      navigate('/'); // or to dashboard
-    } catch (err) {
+      navigate('/dashboard');
+    } catch (err: any) {
       console.error(err.response.data);
     }
   };

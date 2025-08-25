@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { User } from '../types';
 
-const PurchasePointsDialog = ({ user, onClose, onPurchase }) => {
+interface PurchasePointsDialogProps {
+  user: User;
+  onClose: () => void;
+  onPurchase: (updatedUser: User) => void;
+}
+
+const PurchasePointsDialog: React.FC<PurchasePointsDialogProps> = ({ user, onClose, onPurchase }) => {
   const [pointsToBuy, setPointsToBuy] = useState(0);
 
   const handlePurchase = async () => {
     try {
-      const res = await axios.post('/api/artipoints/purchase', { points: pointsToBuy });
+      const res = await axios.post<User>('/api/artipoints/purchase', { points: pointsToBuy });
       onPurchase(res.data);
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err.response.data);
     }
   };
