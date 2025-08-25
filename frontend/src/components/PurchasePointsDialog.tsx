@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import { User } from '../types';
 
 interface PurchasePointsDialogProps {
@@ -13,7 +13,7 @@ const PurchasePointsDialog: React.FC<PurchasePointsDialogProps> = ({ user, onClo
 
   const handlePurchase = async () => {
     try {
-      const res = await axios.post<User>('/api/artipoints/purchase', { points: pointsToBuy });
+      const res = await api.post<User>('/api/artipoints/purchase', { points: pointsToBuy });
       onPurchase(res.data);
       onClose();
     } catch (err: any) {

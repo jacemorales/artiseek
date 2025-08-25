@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import CreateServiceForm from './CreateServiceForm.tsx';
+import api from '../api/axios';
+import CreateServiceForm from './CreateServiceForm';
 import { Service } from '../types';
 
 const MyServicesPage: React.FC = () => {
@@ -10,7 +10,7 @@ const MyServicesPage: React.FC = () => {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const res = await axios.get<Service[]>('/api/services/my');
+                const res = await api.get<Service[]>('/api/services/my');
                 setServices(res.data);
             } catch (err) {
                 console.error(err);

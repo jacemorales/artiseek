@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 
 const SignupPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -32,7 +32,7 @@ const SignupPage: React.FC = () => {
         password,
         userType,
       };
-      await axios.post('/api/users/register', newUser);
+      await api.post('/api/users/register', newUser);
       alert('Verification email sent! Please check your inbox.');
       navigate('/login');
     } catch (err: any) {

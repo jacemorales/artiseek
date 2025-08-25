@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import { Service } from '../types';
 
 interface CreateServiceFormProps {
@@ -22,7 +22,7 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ onServiceCreated 
     const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const res = await axios.post<Service>('/api/services', {
+            const res = await api.post<Service>('/api/services', {
                 ...formData,
                 price: Number(price)
             });

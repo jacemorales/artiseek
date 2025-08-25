@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import setAuthToken from '../utils/setAuthToken.ts';
+import api from '../api/axios';
+import setAuthToken from '../utils/setAuthToken';
 import TopMenu from './TopMenu.tsx';
 import SideMenu from './SideMenu.tsx';
 import { User } from '../types';
@@ -15,7 +15,7 @@ const Dashboard: React.FC = () => {
         setAuthToken(localStorage.token);
       }
       try {
-        const res = await axios.get<User>('/api/users/me');
+        const res = await api.get<User>('/api/users/me');
         setUser(res.data);
       } catch (err) {
         console.error(err);

@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import { Project } from '../types';
 
 interface CreateProjectFormProps {
@@ -22,7 +22,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onProjectCreated 
     const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const res = await axios.post<Project>('/api/projects', {
+            const res = await api.post<Project>('/api/projects', {
                 ...formData,
                 budget: Number(budget)
             });

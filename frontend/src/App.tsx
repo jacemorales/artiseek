@@ -1,14 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './components/HomePage';
-import LoginPage from './components/LoginPage';
-import SignupPage from './components/SignupPage';
-import OnboardingPage from './components/OnboardingPage';
-import Dashboard from './components/Dashboard';
-import MyServicesPage from './components/MyServicesPage';
-import MyProjectsPage from './components/MyProjectsPage';
-import ProjectDetailsPage from './components/ProjectDetailsPage';
-import PrivateRoute from './components/PrivateRoute';
+import HomePage from './components/HomePage.tsx';
+import LoginPage from './components/LoginPage.tsx';
+import SignupPage from './components/SignupPage.tsx';
+import OnboardingPage from './components/OnboardingPage.tsx';
+import Dashboard from './components/Dashboard.tsx';
+import MyServicesPage from './components/MyServicesPage.tsx';
+import MyProjectsPage from './components/MyProjectsPage.tsx';
+import ProjectDetailsPage from './components/ProjectDetailsPage.tsx';
+import EmailVerificationPage from './components/EmailVerificationPage.tsx';
+import PrivateRoute from './components/PrivateRoute.tsx';
 import './App.css';
 
 const App: React.FC = () => {
@@ -19,6 +20,9 @@ const App: React.FC = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/verify-email/:token" element={<EmailVerificationPage />} />
+
+          {/* Private Routes */}
           <Route path="/onboarding" element={<PrivateRoute />}>
             <Route path="/onboarding" element={<OnboardingPage />} />
           </Route>

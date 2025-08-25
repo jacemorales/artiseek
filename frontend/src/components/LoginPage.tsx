@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +17,7 @@ const LoginPage: React.FC = () => {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/users/login', { email, password });
+      const res = await api.post('/api/users/login', { email, password });
       localStorage.setItem('token', res.data.token);
       if (res.data.user.onboardingComplete) {
         navigate('/dashboard');

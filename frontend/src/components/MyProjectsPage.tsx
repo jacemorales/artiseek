@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import CreateProjectForm from './CreateProjectForm.tsx';
+import api from '../api/axios';
+import CreateProjectForm from './CreateProjectForm';
 import { Project } from '../types';
 
 const MyProjectsPage: React.FC = () => {
@@ -10,7 +10,7 @@ const MyProjectsPage: React.FC = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const res = await axios.get<Project[]>('/api/projects/my');
+                const res = await api.get<Project[]>('/api/projects/my');
                 setProjects(res.data);
             } catch (err) {
                 console.error(err);

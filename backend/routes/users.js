@@ -43,9 +43,7 @@ router.post('/register', async (req, res) => {
     });
 
     // Send verification email
-    const verificationURL = `${req.protocol}://${req.get(
-      'host'
-    )}/api/users/verify/${verificationToken}`;
+    const verificationURL = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
 
     const message = `Please verify your email by clicking on the following link: \n\n ${verificationURL}`;
 
