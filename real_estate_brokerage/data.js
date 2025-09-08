@@ -1,3 +1,28 @@
+function generateHouseSvg(seed) {
+    // A simple seeded random number generator to make SVGs different
+    let random = Math.sin(seed) * 10000;
+    random = random - Math.floor(random);
+
+    const color1 = `hsl(${180 + random * 60}, 70%, 50%)`; // Shades of blue/cyan
+    const color2 = `hsl(${200 + random * 60}, 80%, 30%)`; // Deeper blues
+
+    const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="background-color: ${color2};">
+            <defs>
+                <linearGradient id="grad-${seed}" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:${color1};stop-opacity:0.3;" />
+                    <stop offset="100%" style="stop-color:${color2};stop-opacity:0.8;" />
+                </linearGradient>
+            </defs>
+            <rect width="100" height="100" fill="url(#grad-${seed})" />
+            <path d="M20 80 L20 40 L50 10 L80 40 L80 80 L60 80 L60 50 L40 50 L40 80 Z"
+                  fill="none" stroke="#ffffff" stroke-width="3" opacity="0.7" transform="rotate(${random * 10 - 5} 50 50)" />
+            <circle cx="${30 + random * 40}" cy="${30 + random * 20}" r="${2 + random * 4}" fill="#ffffff" opacity="0.5" />
+        </svg>
+    `;
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 const properties = [
     {
         id: 1,
@@ -7,13 +32,13 @@ const properties = [
         beds: 5,
         baths: 6,
         sqft: 5500,
-        image: "https://source.unsplash.com/800x600/?luxury,villa",
+        image: generateHouseSvg(1),
         description: "An exquisite villa in the heart of Beverly Hills. This property boasts a private pool, home theater, and breathtaking city views. The ultimate in luxury living.",
         images: [
-            "https://source.unsplash.com/800x600/?luxury,villa,livingroom",
-            "https://source.unsplash.com/800x600/?luxury,villa,pool",
-            "https://source.unsplash.com/800x600/?luxury,villa,bedroom",
-            "https://source.unsplash.com/800x600/?luxury,villa,kitchen"
+            generateHouseSvg(11),
+            generateHouseSvg(12),
+            generateHouseSvg(13),
+            generateHouseSvg(14)
         ]
     },
     {
@@ -24,13 +49,13 @@ const properties = [
         beds: 4,
         baths: 3,
         sqft: 2800,
-        image: "https://source.unsplash.com/800x600/?suburban,house",
+        image: generateHouseSvg(2),
         description: "A beautiful family home in a quiet suburban neighborhood. Features a large backyard, a modern kitchen, and is close to top-rated schools.",
         images: [
-            "https://source.unsplash.com/800x600/?suburban,house,exterior",
-            "https://source.unsplash.com/800x600/?suburban,house,kitchen",
-            "https://source.unsplash.com/800x600/?suburban,house,backyard",
-            "https://source.unsplash.com/800x600/?suburban,house,livingroom"
+            generateHouseSvg(21),
+            generateHouseSvg(22),
+            generateHouseSvg(23),
+            generateHouseSvg(24)
         ]
     },
     {
@@ -41,12 +66,12 @@ const properties = [
         beds: 2,
         baths: 2,
         sqft: 1600,
-        image: "https://source.unsplash.com/800x600/?urban,loft",
+        image: generateHouseSvg(3),
         description: "A stylish loft in a prime downtown location. Open-concept living space with industrial-chic design, exposed brick, and stunning city views.",
         images: [
-            "https://source.unsplash.com/800x600/?urban,loft,interior",
-            "https://source.unsplash.com/800x600/?urban,loft,window",
-            "https://source.unsplash.com/800x600/?urban,loft,bedroom"
+            generateHouseSvg(31),
+            generateHouseSvg(32),
+            generateHouseSvg(33)
         ]
     },
     {
@@ -57,12 +82,12 @@ const properties = [
         beds: 3,
         baths: 2,
         sqft: 2000,
-        image: "https://source.unsplash.com/800x600/?mountain,cabin",
+        image: generateHouseSvg(4),
         description: "Escape to this charming rustic cabin with stunning mountain views. Features a stone fireplace, wood beams, and a large deck perfect for nature lovers.",
         images: [
-            "https://source.unsplash.com/800x600/?mountain,cabin,interior",
-            "https://source.unsplash.com/800x600/?mountain,cabin,view",
-            "https://source.unsplash.com/800x600/?mountain,cabin,fireplace"
+            generateHouseSvg(41),
+            generateHouseSvg(42),
+            generateHouseSvg(43)
         ]
     }
 ];

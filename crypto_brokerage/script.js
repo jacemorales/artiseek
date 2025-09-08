@@ -8,6 +8,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const apiUrl = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=12&page=1&sparkline=false';
 
+    function generateCoinSvg(symbol) {
+        const cleanSymbol = symbol.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        const svg = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <defs>
+                    <radialGradient id="grad-${cleanSymbol}" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                        <stop offset="0%" style="stop-color:#e94560;stop-opacity:0.5" />
+                        <stop offset="100%" style="stop-color:#0f3460;stop-opacity:1" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="50" fill="url(#grad-${cleanSymbol})" />
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#f0f0f0" font-size="30" font-family="Roboto, sans-serif" font-weight="bold">${cleanSymbol}</text>
+            </svg>
+        `;
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    }
+
     async function fetchCryptoData() {
         try {
             const response = await fetch(apiUrl);
@@ -24,15 +41,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayCryptoData(coins) {
         marketContainer.innerHTML = ''; // Clear loader or previous content
-        coins.forEach(coin => {
+        coins.forEach((coin, index) => {
             const priceChange = coin.price_change_percentage_24h;
             const priceChangeClass = priceChange >= 0 ? 'positive' : 'negative';
 
             const cryptoCard = document.createElement('div');
             cryptoCard.classList.add('crypto-card');
+            cryptoCard.style.setProperty('--card-index', index);
             cryptoCard.innerHTML = `
                 <div class="card-header">
-                    <img src="${coin.image}" alt="${coin.name}">
+                    <img src="${generateCoinSvg(coin.symbol)}" alt="${coin.name} logo">
                     <div class="name-symbol">
                         <h3>${coin.name}</h3>
                         <p>${coin.symbol.toUpperCase()}</p>

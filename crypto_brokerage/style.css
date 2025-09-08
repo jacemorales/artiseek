@@ -1,12 +1,14 @@
-/* Crypto Brokerage Styles */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@400;700&display=swap');
+
 :root {
-    --primary-color: #1a1a2e; /* Deep Navy */
-    --secondary-color: #16213e; /* Darker Blue */
-    --accent-color: #0f3460; /* Royal Blue */
-    --highlight-color: #e94560; /* Pink/Red Highlight */
-    --text-color: #f0f0f0;
-    --green: #2ecc71;
-    --red: #e74c3c;
+    --primary-color: #0D0221; /* Void Black */
+    --secondary-color: #2D033B; /* Nebula Purple */
+    --accent-color: #810CA8; /* Cyber Purple */
+    --highlight-color: #C147E9; /* Hyper Pink */
+    --text-color: #F0F0F0;
+    --glow-color: rgba(193, 71, 233, 0.5);
+    --green: #00FFAB;
+    --red: #FF4D4D;
 }
 
 * {
@@ -16,25 +18,39 @@
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
     line-height: 1.6;
     color: var(--text-color);
     background-color: var(--primary-color);
+    background-image: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 5px var(--glow-color);
 }
 
 a {
     text-decoration: none;
     color: var(--highlight-color);
+    transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
-/* Header */
+a:hover {
+    color: #fff;
+    text-shadow: 0 0 10px var(--glow-color);
+}
+
 header {
-    background: var(--secondary-color);
+    background: rgba(13, 2, 33, 0.5);
+    backdrop-filter: blur(10px);
     padding: 1rem 0;
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 1px solid var(--accent-color);
+    border-bottom: 1px solid rgba(193, 71, 233, 0.3);
 }
 
 nav {
@@ -46,95 +62,83 @@ nav {
 }
 
 nav .logo a {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: bold;
     color: var(--text-color);
 }
 
-nav ul {
+nav .nav-links {
     list-style: none;
     display: flex;
 }
 
-nav ul li {
-    margin-left: 20px;
+nav .nav-links li {
+    margin-left: 30px;
 }
 
-nav ul li a {
-    color: var(--text-color);
-    padding: 5px 10px;
-    transition: color 0.3s ease;
-}
-
-nav ul li a:hover {
-    color: var(--highlight-color);
-}
-
-/* Main Content */
 main {
     width: 90%;
     margin: auto;
 }
 
-/* Hero Section */
 .hero {
     text-align: center;
-    padding: 6rem 0;
+    padding: 8rem 0;
+    background: radial-gradient(ellipse at bottom, rgba(45, 3, 59, 0.5) 0%, transparent 70%);
 }
 
 .hero-content h1 {
-    font-size: 3rem;
+    font-size: 4rem;
     margin-bottom: 1rem;
 }
 
 .hero-content p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    margin-bottom: 2.5rem;
     color: #a0a0a0;
 }
 
 .cta-button {
-    background: var(--highlight-color);
+    background: linear-gradient(45deg, var(--highlight-color), var(--accent-color));
     color: var(--text-color);
-    padding: 15px 30px;
-    font-size: 1.1rem;
+    padding: 15px 35px;
+    font-size: 1.2rem;
     border-radius: 5px;
-    transition: background 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: none;
+    box-shadow: 0 0 15px var(--glow-color);
+    font-family: 'Orbitron', sans-serif;
 }
 
 .cta-button:hover {
-    background: #d43f5a;
+    transform: scale(1.05);
+    box-shadow: 0 0 25px var(--glow-color);
 }
 
-/* Crypto Market */
 .crypto-market {
     padding: 4rem 0;
-    text-align: center;
 }
 
 .crypto-market h2 {
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
+    font-size: 3rem;
+    margin-bottom: 3rem;
+    text-align: center;
 }
 
 .market-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
-    text-align: left;
 }
 
-/* Footer */
 footer {
-    background: var(--secondary-color);
+    background: transparent;
     text-align: center;
     padding: 2rem 0;
-    border-top: 1px solid var(--accent-color);
-    margin-top: 2rem;
+    border-top: 1px solid rgba(193, 71, 233, 0.3);
+    margin-top: 4rem;
 }
 
-/* Modal */
 .modal {
     position: fixed;
     z-index: 1001;
@@ -142,8 +146,8 @@ footer {
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.7);
+    background-color: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -157,13 +161,14 @@ footer {
     width: 90%;
     max-width: 500px;
     position: relative;
-    animation: fadeIn 0.3s;
+    animation: modalFadeIn 0.3s;
     max-height: 90vh;
     overflow-y: auto;
+    box-shadow: 0 0 20px var(--glow-color);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.9); }
     to { opacity: 1; transform: scale(1); }
 }
 
@@ -175,10 +180,10 @@ footer {
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+    transition: color 0.3s ease;
 }
 
-.close-button:hover,
-.close-button:focus {
+.close-button:hover {
     color: var(--highlight-color);
 }
 
@@ -186,41 +191,58 @@ footer {
     display: block;
     margin-top: 1rem;
     margin-bottom: 0.5rem;
+    font-weight: 700;
 }
 
 #invest-form input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     background: var(--primary-color);
     border: 1px solid var(--accent-color);
     color: var(--text-color);
     border-radius: 5px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
 }
 
 #invest-form button {
     width: 100%;
     padding: 15px;
     margin-top: 2rem;
-    background: var(--highlight-color);
+    background: linear-gradient(45deg, var(--highlight-color), var(--accent-color));
     color: var(--text-color);
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    font-family: 'Orbitron', sans-serif;
+    box-shadow: 0 0 15px var(--glow-color);
+    transition: transform 0.3s ease;
 }
 
-/* Crypto Card */
+#invest-form button:hover {
+    transform: scale(1.02);
+}
+
+@keyframes cardFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .crypto-card {
-    background: var(--secondary-color);
+    background: rgba(45, 3, 59, 0.4);
     border: 1px solid var(--accent-color);
     border-radius: 8px;
     padding: 1.5rem;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    opacity: 0;
+    animation: cardFadeIn 0.5s ease-out forwards;
+    animation-delay: calc(var(--card-index) * 100ms);
 }
 
 .crypto-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(233, 69, 96, 0.1);
+    box-shadow: 0 0 15px var(--glow-color);
 }
 
 .crypto-card .card-header {
@@ -235,25 +257,15 @@ footer {
     margin-right: 1rem;
 }
 
-.crypto-card .name-symbol h3 {
-    font-size: 1.4rem;
-    margin: 0;
-}
-
 .crypto-card .name-symbol p {
     color: #a0a0a0;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 .crypto-card .card-body .price {
-    font-size: 1.8rem;
-    font-weight: bold;
+    font-size: 2rem;
+    font-weight: 700;
     margin-bottom: 0.5rem;
-}
-
-.crypto-card .card-body .change {
-    font-size: 1.1rem;
-    font-weight: bold;
 }
 
 .crypto-card .change.positive {
@@ -276,6 +288,7 @@ footer {
     font-size: 1rem;
     font-weight: bold;
     transition: background 0.3s ease, color 0.3s ease;
+    font-family: 'Orbitron', sans-serif;
 }
 
 .btn-invest:hover {
@@ -287,7 +300,6 @@ body.no-scroll {
     overflow: hidden;
 }
 
-/* Mobile Navigation */
 .hamburger {
     display: none;
     cursor: pointer;
@@ -303,23 +315,27 @@ body.no-scroll {
 }
 
 @media screen and (max-width: 768px) {
+    .hero-content h1 { font-size: 2.5rem; }
+    .hero-content p { font-size: 1.2rem; }
+
     .nav-links {
         position: fixed;
         top: 0;
-        left: 100%;
+        right: 0;
         width: 100%;
         height: 100vh;
-        background-color: var(--secondary-color); /* Changed for better visibility */
+        background-color: var(--secondary-color);
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        transition: left 0.3s ease;
         z-index: 100;
         padding-left: 0;
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
     }
 
     .nav-links.active {
-        left: 0;
+        transform: translateX(0%);
     }
 
     .nav-links li {
@@ -334,7 +350,6 @@ body.no-scroll {
         display: block;
     }
 
-    /* Animate hamburger into an 'X' */
     .hamburger.active .line:nth-child(1) {
         transform: rotate(-45deg) translate(-5px, 6px);
     }
@@ -346,7 +361,6 @@ body.no-scroll {
     }
 }
 
-/* Learn Page */
 .learn-main {
     padding: 2rem 0;
 }
@@ -354,26 +368,22 @@ body.no-scroll {
 .learn-hero {
     text-align: center;
     padding: 4rem 0;
-    background-color: var(--secondary-color);
+    background-color: rgba(45, 3, 59, 0.4);
     border-radius: 8px;
     margin-bottom: 3rem;
+    border: 1px solid var(--accent-color);
 }
 
 .learn-hero h1 {
     font-size: 2.8rem;
-    margin-bottom: 1rem;
-}
-
-.learn-hero p {
-    font-size: 1.2rem;
-    color: #a0a0a0;
 }
 
 .learn-content article {
-    background: var(--secondary-color);
+    background: rgba(45, 3, 59, 0.4);
     padding: 2rem;
     border-radius: 8px;
     margin-bottom: 2rem;
+    border: 1px solid var(--accent-color);
 }
 
 .learn-content h2 {
@@ -384,4 +394,5 @@ body.no-scroll {
 
 .learn-content p {
     line-height: 1.8;
+    font-size: 1.1rem;
 }

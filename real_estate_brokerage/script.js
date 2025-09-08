@@ -13,9 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        properties.forEach(property => {
+        properties.forEach((property, index) => {
             const propertyCard = document.createElement('div');
             propertyCard.classList.add('property-card');
+            propertyCard.style.setProperty('--card-index', index);
             propertyCard.innerHTML = `
                 <img src="${property.image}" alt="${property.title}">
                 <div class="card-content">
