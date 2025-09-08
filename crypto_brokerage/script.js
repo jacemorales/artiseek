@@ -89,4 +89,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (marketContainer) {
         fetchCryptoData();
     }
+
+    // Mobile Nav
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (hamburger) {
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            document.body.classList.toggle('no-scroll');
+        });
+    }
 });
