@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBalancesUI();
         alert(`Successfully invested $${amount}!`);
         investModal.style.display = 'none';
-        fetchData(true); // Re-fetch to update chart
     }
 
     function handleWithdrawal() {
@@ -83,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAllUserData(updatedUser);
         updateBalancesUI();
         alert('Investment balance withdrawn successfully!');
-        renderChart(); // Re-render chart with 0 balance
     }
 
     // --- UI Rendering ---
@@ -96,30 +94,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const primaryCoin = coins[0];
         const sparkline = primaryCoin.sparkline_in_7d.price;
-        const minPrice = Math.min(...sparkline);
-        const maxPrice = Math.max(...sparkline);
         const initialPrice = sparkline[0];
-        const currentPrice = sparkline[sparkline.length - 1];
-        const earnings = (100 / initialPrice) * currentPrice;
-        const earningsText = `A $100 investment 7d ago would be worth ~$${earnings.toFixed(2)} today.`;
 
         const options = {
             chart: { type: 'area', height: 350, toolbar: { show: false }, zoom: { enabled: false }, background: 'transparent' },
             series: [{ name: 'Price (USD)', data: sparkline }],
-            xaxis: { type: 'numeric', labels: { show: false } },
-            yaxis: { labels: { formatter: (val) => `$${val.toLocaleString()}`, style: { colors: '#a0a0a0' } } },
-            tooltip: { theme: 'dark', x: { show: false } },
-            grid: { borderColor: 'rgba(255,255,255,0.1)' },
-            title: { text: `${primaryCoin.name} 7-Day Price Chart`, align: 'left', style: { color: '#fff', fontSize: '16px' } },
-            subtitle: { text: earningsText, align: 'left', style: { color: '#00FFAB', fontSize: '14px' } },
-            fill: { type: "gradient", gradient: { shade: 'dark', type: "vertical", shadeIntensity: 0.5, gradientToColors: ['#00FFAB'], inverseColors: true, opacityFrom: 0.7, opacityTo: 0.3, stops: [0, 90, 100] } },
+            xaxis: { type: 'numeric', labels: { show: false }, axisTicks: { show: false }, axisBorder: { show: false } },
+            yaxis: { labels: { formatter: (val) => `$${val.toFixed(2)}`, style: { colors: '#a0a0a0' } } },
+            tooltip: {
+                enabled: true,
+                theme: 'dark',
+                custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                    const hoveredPrice = series[seriesIndex][dataPointIndex];
+                    const earnings = (100 / initialPrice) * hoveredPrice;
+                    return `<div class="chart-tooltip">
+                                <strong>Potential Value:</strong> $${earnings.toFixed(2)}
+                                <small>(from a $100 investment 7d ago)</small>
+                            </div>`;
+                }
+            },
+            grid: { show: true, borderColor: 'rgba(255,255,255,0.1)', strokeDashArray: 4 },
+            title: { text: `${primaryCoin.name} 7-Day Market Performance`, align: 'left', style: { color: '#fff', fontSize: '16px' } },
+            subtitle: { text: 'Hover over the chart for potential earnings details.', align: 'left', style: { color: '#a0a0a0', fontSize: '14px' } },
+            fill: { type: "gradient", gradient: { shade: 'dark', type: "vertical", shadeIntensity: 0.5, gradientToColors: ['#00FFAB'], inverseColors: true, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 100] } },
             stroke: { curve: 'smooth', width: 2, colors: ['#C147E9'] },
-            annotations: {
-                points: [
-                    { x: sparkline.indexOf(minPrice), y: minPrice, marker: { size: 6, fillColor: '#fff', strokeColor: '#FF4D4D', radius: 2 }, label: { borderColor: '#FF4D4D', text: `7d Low: $${minPrice.toFixed(2)}` } },
-                    { x: sparkline.indexOf(maxPrice), y: maxPrice, marker: { size: 6, fillColor: '#fff', strokeColor: '#00FFAB', radius: 2 }, label: { borderColor: '#00FFAB', text: `7d High: $${maxPrice.toFixed(2)}` } }
-                ]
-            }
         };
         const chart = new ApexCharts(chartContainer, options);
         chart.render();
@@ -159,18 +157,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('investment-form').addEventListener('submit', handleInvestment);
     }
 
-    async function fetchData(isUpdate = false) {
+    async function fetchData() {
         try {
             const response = await fetch(apiUrl);
             if (!response.ok) throw new Error('API Error');
             const data = await response.json();
-            if (!isUpdate) { // Only render market list on initial load
-                displayCryptoData(data);
-            }
             renderChart(data);
+            displayCryptoData(data);
         } catch (error) {
             marketContainer.innerHTML = `<p>Could not load market data.</p>`;
-            chartContainer.innerHTML = `<p>Could not load chart data.</p>`;
+            chartContainer.innerHTML = `<p class="no-investments">Could not load chart data.</p>`;
         }
     }
 

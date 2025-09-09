@@ -357,6 +357,19 @@ body.no-scroll {
     transform: rotate(180deg);
 }
 
+.chart-tooltip {
+    padding: 0.5rem 1rem;
+    background: var(--primary-color);
+    border: 1px solid var(--accent-color);
+    color: var(--text-color);
+}
+
+.chart-tooltip small {
+    display: block;
+    color: #a0a0a0;
+    margin-top: 0.25rem;
+}
+
 /* Make ApexCharts annotations match the theme */
 .apexcharts-point-annotations .apexcharts-marker {
     stroke-width: 3px;
