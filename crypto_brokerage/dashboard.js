@@ -89,19 +89,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const sparkline = primaryCoin.sparkline_in_7d.price;
         const initialPrice = sparkline[0];
         const currentPrice = sparkline[sparkline.length - 1];
+        const maxPrice = Math.max(...sparkline);
         const trendIsUp = currentPrice >= initialPrice;
         const chartColor = trendIsUp ? '#00FFAB' : '#FF4D4D';
 
-        const options = {
+        let options = {
             chart: { type: currentChartType, height: 350, toolbar: { show: false }, zoom: { enabled: false }, background: 'transparent' },
+            dataLabels: { enabled: false },
             series: [{ name: 'Price (USD)', data: sparkline }],
-            xaxis: { type: 'numeric', labels: { show: false }, axisTicks: { show: false }, axisBorder: { show: false } },
             yaxis: { labels: { formatter: (val) => `$${val.toFixed(2)}`, style: { colors: '#a0a0a0' } } },
-            grid: { show: true, borderColor: 'rgba(255,255,255,0.2)', strokeDashArray: 0 },
+            grid: { show: true, borderColor: 'rgba(255,255,255,0.2)', strokeDashArray: 0, yaxis: { lines: { show: true } } },
             title: { text: `${primaryCoin.name} 7-Day Market Performance`, align: 'left', style: { color: '#fff', fontSize: '16px' } },
             subtitle: { text: 'Hover for potential value of a $100 investment.', align: 'left', style: { color: '#a0a0a0', fontSize: '14px' } },
-            fill: { type: "gradient", gradient: { shade: 'dark', type: "vertical", shadeIntensity: 0.5, gradientToColors: [chartColor], inverseColors: false, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 100] } },
-            stroke: { curve: 'smooth', width: 2, colors: [chartColor] },
             tooltip: {
                 enabled: true,
                 theme: 'dark',
@@ -112,6 +111,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             },
         };
+
+        if (currentChartType === 'area') {
+            options.xaxis = { type: 'numeric', labels: { show: false }, axisTicks: { show: false }, axisBorder: { show: false } };
+            options.fill = { type: "gradient", gradient: { shade: 'dark', type: "vertical", shadeIntensity: 0.5, gradientToColors: [chartColor], inverseColors: false, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 100] } };
+            options.stroke = { curve: 'smooth', width: 2, colors: [chartColor] };
+        } else if (currentChartType === 'bar') {
+            options.xaxis = { type: 'category', categories: sparkline.map((_, i) => i), labels: { show: false }, axisTicks: { show: false }, axisBorder: { show: false } };
+            options.plotOptions = { bar: { columnWidth: '80%', colors: { ranges: [{ from: 0, to: maxPrice, color: chartColor }] } } };
+            options.fill = { colors: [chartColor] };
+        }
+
         const chart = new ApexCharts(chartContainer, options);
         chart.render();
     }
