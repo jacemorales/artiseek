@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const withdrawBtn = document.getElementById('withdraw-btn');
     const marketContainer = document.querySelector('.market-container');
     const chartContainer = document.getElementById('chart-container');
+    const chartTitleEl = document.getElementById('chart-title');
+    const chartSubtitleEl = document.getElementById('chart-subtitle');
     const investModal = document.getElementById('invest-modal');
     const investModalContent = document.getElementById('invest-modal-content');
     const lineChartBtn = document.getElementById('line-chart-btn');
@@ -83,37 +85,45 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- UI Rendering ---
     function renderChart() {
         chartContainer.innerHTML = '';
-        if (ohlcData.length === 0) {
-            chartContainer.innerHTML = `<p class="no-investments">Market chart data currently unavailable.</p>`;
-            return;
-        }
-
-        const seriesData = ohlcData.map(d => ({ x: new Date(d[0]), y: [d[1], d[2], d[3], d[4]] }));
-        const trendIsUp = ohlcData[ohlcData.length - 1][4] >= ohlcData[0][1]; // Compare last close to first open
+        const primaryCoin = marketData.length > 0 ? marketData[0] : { name: 'Bitcoin' };
 
         let options = {
-            chart: { type: 'candlestick', height: 350, background: 'transparent' },
-            series: [{ data: seriesData }],
-            title: { text: 'Bitcoin 7-Day Candlestick Chart', align: 'left', style: { color: '#fff' } },
-            xaxis: { type: 'datetime', labels: { style: { colors: '#a0a0a0' } } },
-            yaxis: { tooltip: { enabled: true }, labels: { style: { colors: '#a0a0a0' } } },
-            grid: { show: true, borderColor: 'rgba(255,255,255,0.2)', strokeDashArray: 0 },
-            plotOptions: {
-                candlestick: {
-                    colors: {
-                        upward: '#00FFAB',
-                        downward: '#FF4D4D'
-                    }
-                }
-            }
+            chart: { height: 350, background: 'transparent', toolbar: { show: true, tools: { download: true, selection: true, zoom: true, zoomin: true, zoomout: true, pan: true, reset: true } } },
+            dataLabels: { enabled: false },
+            grid: { show: true, borderColor: 'rgba(255,255,255,0.2)', strokeDashArray: 0, yaxis: { lines: { show: true } } },
+            tooltip: { enabled: true, theme: 'dark' },
         };
 
         if (currentChartType === 'area') {
+            if (ohlcData.length === 0) { chartContainer.innerHTML = `<p class="no-investments">Market data currently unavailable.</p>`; return; }
+            const sparkline = ohlcData.map(d => d[4]);
+            const initialPrice = sparkline[0];
+            const investmentValueSeries = sparkline.map(price => (100 / initialPrice) * price * rate);
+
+            chartTitleEl.textContent = `7-Day Performance of a $100 Investment in ${primaryCoin.name}`;
+            chartSubtitleEl.textContent = 'Values include a 1.05x rate multiplier.';
+
             options.chart.type = 'area';
-            options.series = [{ name: 'Price (USD)', data: ohlcData.map(d => [d[0], d[4]]) }]; // Use closing price for area chart
-            options.colors = [trendIsUp ? '#00FFAB' : '#FF4D4D'];
+            options.series = [{ name: 'Investment Value', data: investmentValueSeries }];
+            options.colors = ['#C147E9'];
             options.stroke = { curve: 'smooth', width: 2 };
-            options.fill = { type: 'gradient', gradient: { shade: 'dark', type: "vertical", shadeIntensity: 0.5, gradientToColors: [trendIsUp ? '#00FFAB' : '#FF4D4D'], inverseColors: false, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 100] } };
+            options.fill = { type: "gradient", gradient: { shade: 'dark', type: "vertical", shadeIntensity: 0.5, gradientToColors: ['#C147E9'], inverseColors: false, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 100] } };
+            options.xaxis = { type: 'numeric', labels: { show: false }, axisTicks: { show: false }, axisBorder: { show: false } };
+            options.yaxis = { labels: { formatter: (val) => `$${val.toFixed(2)}`, style: { colors: '#a0a0a0' } } };
+            options.tooltip.x = { show: false };
+
+        } else if (currentChartType === 'candlestick') {
+            if (ohlcData.length === 0) { chartContainer.innerHTML = `<p class="no-investments">Market data currently unavailable.</p>`; return; }
+            const seriesData = ohlcData.map(d => ({ x: new Date(d[0]), y: [d[1], d[2], d[3], d[4]] }));
+
+            chartTitleEl.textContent = `${primaryCoin.name} 7-Day Market Data (OHLC)`;
+            chartSubtitleEl.textContent = 'Displaying real Open, High, Low, and Close price data.';
+
+            options.chart.type = 'candlestick';
+            options.series = [{ data: seriesData }];
+            options.xaxis = { type: 'datetime', labels: { style: { colors: '#a0a0a0' } } };
+            options.yaxis = { tooltip: { enabled: true }, labels: { formatter: (val) => `$${val.toLocaleString()}`, style: { colors: '#a0a0a0' } } };
+            options.plotOptions = { candlestick: { colors: { upward: '#00FFAB', downward: '#FF4D4D' } } };
         }
 
         const chart = new ApexCharts(chartContainer, options);
@@ -156,17 +166,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchData() {
         try {
-            const [marketsResponse, ohlcResponse] = await Promise.all([
-                fetch(marketsApiUrl),
-                fetch(ohlcApiUrl)
-            ]);
+            const [marketsResponse, ohlcResponse] = await Promise.all([ fetch(marketsApiUrl), fetch(ohlcApiUrl) ]);
             if (!marketsResponse.ok || !ohlcResponse.ok) throw new Error('API Error');
             marketData = await marketsResponse.json();
             ohlcData = await ohlcResponse.json();
 
             renderChart();
             displayCryptoData(marketData);
-            console.log("Market data updated.");
         } catch (error) {
             marketContainer.innerHTML = `<p>Could not load market data.</p>`;
             chartContainer.innerHTML = `<p class="no-investments">Could not load chart data.</p>`;
@@ -204,5 +210,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initial Load ---
     updateBalancesUI();
     fetchData();
-    setInterval(fetchData, 60000);
 });

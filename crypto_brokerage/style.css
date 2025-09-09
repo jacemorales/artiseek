@@ -357,6 +357,20 @@ body.no-scroll {
     transform: rotate(180deg);
 }
 
+#chart-title-container {
+    padding: 1rem 0;
+}
+
+#chart-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+#chart-subtitle {
+    font-size: 1rem;
+    color: #a0a0a0;
+}
+
 .chart-header {
     display: flex;
     justify-content: space-between;

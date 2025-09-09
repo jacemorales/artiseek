@@ -33,10 +33,14 @@
                 <h2>Market Overview</h2>
                 <div class="chart-toggle">
                     <button id="line-chart-btn" class="toggle-btn active">Line</button>
-                    <button id="bar-chart-btn" class="toggle-btn">Bar</button>
+                    <button id="bar-chart-btn" class="toggle-btn">Candlestick</button>
                 </div>
             </div>
-            <div id="chart-container" style="height: 300px;">
+            <div id="chart-title-container">
+                <h3 id="chart-title"></h3>
+                <p id="chart-subtitle"></p>
+            </div>
+            <div id="chart-container">
                 <!-- Chart will be rendered here -->
             </div>
             <div class="investment-info">
