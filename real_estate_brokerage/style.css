@@ -244,6 +244,17 @@ main {
     background: var(--card-bg);
     border-radius: 10px;
     box-shadow: 0 5px 25px var(--shadow-color);
+    text-align: center;
+}
+
+.social-links {
+    margin-top: 2rem;
+}
+
+.social-link {
+    margin: 0 1rem;
+    text-decoration: underline;
+    font-weight: 600;
 }
 
 .contact-form, .purchase-form {
@@ -391,6 +402,11 @@ footer {
     background: var(--card-bg);
     border-radius: 15px;
     box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+.contact-link-p {
+    text-align: center;
+    margin-top: 1.5rem;
 }
 
 /* Mobile Navigation */

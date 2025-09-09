@@ -97,11 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="tel" name="phone" placeholder="Phone Number" required>
                     <select name="financing" required>
                         <option value="">Financing Option</option>
-                        <option value="cash">Cash</option>
                         <option value="mortgage">Pre-approved Mortgage</option>
                     </select>
                     <button type="submit">Submit Inquiry</button>
                 </form>
+                <p class="contact-link-p">For more details, <a href="#contact-property">contact an agent</a>.</p>
             </section>
         `;
 

@@ -12,33 +12,15 @@
             <div class="logo">
                 <a href="index.html">CryptoVerse</a>
             </div>
-            <div class="hamburger">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
         </nav>
     </header>
-
-    <ul class="nav-links">
-        <li class="nav-close-btn-container"><span class="nav-close-btn">&times;</span></li>
-        <li><a href="#market">Market</a></li>
-        <li><a href="learn.html">Learn</a></li>
-    </ul>
 
     <main>
         <section class="hero">
             <div class="hero-content">
                 <h1>Invest in the Future of Finance</h1>
                 <p>Buy, sell, and hold cryptocurrencies with confidence.</p>
-                <a href="#market" class="cta-button">Start Investing</a>
-            </div>
-        </section>
-
-        <section id="market" class="crypto-market">
-            <h2>Live Market</h2>
-            <div class="market-container">
-                <!-- Crypto cards will be inserted here by JavaScript -->
+                <button id="start-investing-btn" class="cta-button">Start Investing</button>
             </div>
         </section>
     </main>
@@ -47,27 +29,13 @@
         <p>&copy; 2025 CryptoVerse. All rights reserved.</p>
     </footer>
 
-    <!-- Investment Modal -->
-    <div id="invest-modal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Invest in <span id="modal-crypto-name"></span></h2>
-            <form id="invest-form">
-                <input type="hidden" id="modal-crypto-id" name="cryptoId">
-                <label for="amount">Amount (USD):</label>
-                <input type="number" id="amount" name="amount" placeholder="e.g., 500" required>
-
-                <label for="name">Full Name:</label>
-                <input type="text" id="name" name="name" required>
-
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-
-                <button type="submit">Complete Investment</button>
-            </form>
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal" style="display:none;">
+        <div class="modal-content" id="auth-modal-content">
+            <!-- Auth form will be injected here by JS -->
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>

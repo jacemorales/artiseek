@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | CryptoVerse</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="dashboard.html">CryptoVerse</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" id="acc-balance">Balance: $10,000</a></li>
+                <li><a href="#" id="logout-btn">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="dashboard-chart">
+            <h2>Market Overview</h2>
+            <div id="chart-container" style="height: 300px;">
+                <!-- Chart will be rendered here -->
+            </div>
+        </section>
+
+        <section id="market" class="crypto-market">
+            <h2>Live Market</h2>
+            <div class="market-container">
+                <!-- Crypto cards will be inserted here by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Investment Modal -->
+    <div id="invest-modal" class="modal" style="display:none;">
+        <div class="modal-content" id="invest-modal-content">
+            <!-- New investment form will be injected here -->
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

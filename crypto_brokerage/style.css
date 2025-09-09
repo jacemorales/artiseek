@@ -196,14 +196,24 @@ footer {
     color: var(--highlight-color);
 }
 
-#invest-form label {
+#auth-modal-content form {
+    display: flex;
+    flex-direction: column;
+}
+
+#auth-modal-content h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+#auth-modal-content label {
     display: block;
     margin-top: 1rem;
     margin-bottom: 0.5rem;
     font-weight: 700;
 }
 
-#invest-form input {
+#auth-modal-content input {
     width: 100%;
     padding: 12px;
     background: var(--primary-color);
@@ -214,7 +224,7 @@ footer {
     font-size: 1.1rem;
 }
 
-#invest-form button {
+#auth-modal-content button {
     width: 100%;
     padding: 15px;
     margin-top: 2rem;
@@ -229,8 +239,18 @@ footer {
     transition: transform 0.3s ease;
 }
 
-#invest-form button:hover {
+#auth-modal-content button:hover {
     transform: scale(1.02);
+}
+
+#auth-modal-content p {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+#auth-modal-content a {
+    font-weight: bold;
+    cursor: pointer;
 }
 
 @keyframes cardFadeIn {

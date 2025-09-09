@@ -7,13 +7,13 @@ const properties = [
         beds: 4,
         baths: 5,
         sqft: 4800,
-        image: "https://source.unsplash.com/800x600/?modern,house,exterior",
+        image: "https://picsum.photos/seed/house1/800/600",
         description: "A stunning architectural statement with panoramic ocean views and state-of-the-art smart home technology.",
         images: [
-            "https://source.unsplash.com/800x600/?modern,livingroom",
-            "https://source.unsplash.com/800x600/?luxury,kitchen",
-            "https://source.unsplash.com/800x600/?infinity,pool",
-            "https://source.unsplash.com/800x600/?luxury,bedroom"
+            "https://picsum.photos/seed/livingroom1/800/600",
+            "https://picsum.photos/seed/kitchen1/800/600",
+            "https://picsum.photos/seed/pool1/800/600",
+            "https://picsum.photos/seed/bedroom1/800/600"
         ]
     },
     {
@@ -24,13 +24,13 @@ const properties = [
         beds: 3,
         baths: 3,
         sqft: 2600,
-        image: "https://source.unsplash.com/800x600/?luxury,apartment,interior",
+        image: "https://picsum.photos/seed/apartment2/800/600",
         description: "A stylish and sophisticated apartment in the heart of the city, featuring high-end finishes and breathtaking skyline views.",
         images: [
-            "https://source.unsplash.com/800x600/?apartment,living,room",
-            "https://source.unsplash.com/800x600/?rooftop,terrace",
-            "https://source.unsplash.com/800x600/?home,office,modern",
-            "https://source.unsplash.com/800x600/?cityscape,window"
+            "https://picsum.photos/seed/loft2/800/600",
+            "https://picsum.photos/seed/rooftop2/800/600",
+            "https://picsum.photos/seed/office2/800/600",
+            "https://picsum.photos/seed/view2/800/600"
         ]
     },
     {
@@ -41,12 +41,12 @@ const properties = [
         beds: 4,
         baths: 3,
         sqft: 3200,
-        image: "https://source.unsplash.com/800x600/?minimalist,home",
+        image: "https://picsum.photos/seed/house3/800/600",
         description: "Experience tranquility and clean design in this minimalist family home, designed for modern living.",
         images: [
-            "https://source.unsplash.com/800x600/?minimalist,living,room",
-            "https://source.unsplash.com/800x600/?house,pool,backyard",
-            "https://source.unsplash.com/800x600/?minimalist,bedroom"
+            "https://picsum.photos/seed/interior3/800/600",
+            "https://picsum.photos/seed/backyard3/800/600",
+            "https://picsum.photos/seed/theater3/800/600"
         ]
     },
     {
@@ -57,12 +57,12 @@ const properties = [
         beds: 5,
         baths: 6,
         sqft: 6000,
-        image: "https://source.unsplash.com/800x600/?large,house,exterior",
+        image: "https://picsum.photos/seed/mansion4/800/600",
         description: "A timeless and elegant estate in a prestigious suburban neighborhood, offering luxury, privacy, and classic design.",
         images: [
-            "https://source.unsplash.com/800x600/?luxury,foyer",
-            "https://source.unsplash.com/800x600/?large,kitchen",
-            "https://source.unsplash.com/800x600/?landscaped,garden"
+            "https://picsum.photos/seed/foyer4/800/600",
+            "https://picsum.photos/seed/kitchen4/800/600",
+            "https://picsum.photos/seed/garden4/800/600"
         ]
     }
 ];
