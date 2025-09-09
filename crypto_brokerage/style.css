@@ -441,4 +441,8 @@ body.no-scroll {
     .learn-hero h1 {
         font-size: 2.2rem;
     }
+
+    .learn-content h2 {
+        font-size: 1.6rem;
+    }
 }
