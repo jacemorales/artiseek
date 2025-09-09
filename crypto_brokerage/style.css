@@ -334,7 +334,7 @@ body.no-scroll {
 
 .learn-hero {
     text-align: center;
-    padding: 4rem 0;
+    padding: 4rem 1rem; /* Added horizontal padding */
     background-color: rgba(45, 3, 59, 0.4);
     border-radius: 8px;
     margin-bottom: 3rem;
@@ -342,7 +342,7 @@ body.no-scroll {
 }
 
 .learn-hero h1 {
-    font-size: 2.8rem;
+    font-size: 2.5rem; /* A safe, large size */
 }
 
 .learn-content article {
@@ -436,10 +436,6 @@ body.no-scroll {
 
     .modal-content h2 {
         font-size: 1.5rem;
-    }
-
-    .learn-hero h1 {
-        font-size: 1.8rem;
     }
 
     .learn-content h2 {
