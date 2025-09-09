@@ -7,13 +7,13 @@ const properties = [
         beds: 4,
         baths: 5,
         sqft: 4800,
-        image: "https://placehold.co/800x600/003366/f4f7f9?text=Ocean+Villa",
+        image: "https://source.unsplash.com/800x600/?house",
         description: "A stunning architectural statement with panoramic ocean views and state-of-the-art smart home technology.",
         images: [
-            "https://placehold.co/800x600/003366/f4f7f9?text=Living+Room",
-            "https://placehold.co/800x600/003366/f4f7f9?text=Kitchen",
-            "https://placehold.co/800x600/003366/f4f7f9?text=Pool",
-            "https://placehold.co/800x600/003366/f4f7f9?text=Bedroom"
+            "https://source.unsplash.com/800x600/?livingroom",
+            "https://source.unsplash.com/800x600/?kitchen",
+            "https://source.unsplash.com/800x600/?pool",
+            "https://source.unsplash.com/800x600/?bedroom"
         ]
     },
     {
@@ -24,13 +24,13 @@ const properties = [
         beds: 3,
         baths: 3,
         sqft: 2600,
-        image: "https://placehold.co/800x600/003366/f4f7f9?text=City+Apartment",
+        image: "https://source.unsplash.com/800x600/?apartment",
         description: "A stylish and sophisticated apartment in the heart of the city, featuring high-end finishes and breathtaking skyline views.",
         images: [
-            "https://placehold.co/800x600/003366/f4f7f9?text=Living+Area",
-            "https://placehold.co/800x600/003366/f4f7f9?text=Rooftop",
-            "https://placehold.co/800x600/003366/f4f7f9?text=Office",
-            "https://placehold.co/800x600/003366/f4f7f9?text=Skyline+View"
+            "https://source.unsplash.com/800x600/?loft",
+            "https://source.unsplash.com/800x600/?rooftop",
+            "https://source.unsplash.com/800x600/?office",
+            "https://source.unsplash.com/800x600/?view"
         ]
     },
     {
@@ -41,12 +41,12 @@ const properties = [
         beds: 4,
         baths: 3,
         sqft: 3200,
-        image: "https://placehold.co/800x600/003366/f4f7f9?text=Family+Home",
+        image: "https://source.unsplash.com/800x600/?minimalist,house",
         description: "Experience tranquility and clean design in this minimalist family home, designed for modern living.",
         images: [
-            "https://placehold.co/800x600/003366/f4f7f9?text=Interior",
-            "https://placehold.co/800x600/003366/f4f7f9?text=Backyard",
-            "https://placehold.co/800x600/003366/f4f7f9?text=Home+Theater"
+            "https://source.unsplash.com/800x600/?minimalist,interior",
+            "https://source.unsplash.com/800x600/?backyard",
+            "https://source.unsplash.com/800x600/?theater"
         ]
     },
     {
@@ -57,12 +57,12 @@ const properties = [
         beds: 5,
         baths: 6,
         sqft: 6000,
-        image: "https://placehold.co/800x600/003366/f4f7f9?text=Suburban+Estate",
+        image: "https://source.unsplash.com/800x600/?mansion",
         description: "A timeless and elegant estate in a prestigious suburban neighborhood, offering luxury, privacy, and classic design.",
         images: [
-            "https://placehold.co/800x600/003366/f4f7f9?text=Foyer",
-            "https://placehold.co/800x600/003366/f4f7f9?text=Gourmet+Kitchen",
-            "https://placehold.co/800x600/003366/f4f7f9?text=Garden"
+            "https://source.unsplash.com/800x600/?foyer",
+            "https://source.unsplash.com/800x600/?gourmet,kitchen",
+            "https://source.unsplash.com/800x600/?garden"
         ]
     }
 ];

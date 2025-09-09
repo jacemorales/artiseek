@@ -218,6 +218,27 @@ main {
     color: var(--light-text-color);
 }
 
+.about-section {
+    padding: 4rem 2rem;
+    text-align: center;
+    background: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 5px 25px var(--shadow-color);
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+}
+
+.about-section h2 {
+    margin-bottom: 1.5rem;
+}
+
+.about-section p {
+    max-width: 800px;
+    margin: auto;
+    line-height: 1.8;
+    color: #555;
+}
+
 .contact-section {
     padding: 4rem 2rem;
     background: var(--card-bg);
