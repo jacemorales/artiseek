@@ -38,11 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle Contact Form Submission
     const contactForm = document.querySelector('.contact-form');
     if(contactForm) {
-        const form = contactForm.querySelector('form');
-        form.addEventListener('submit', (e) => {
+        contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
             alert('Thank you for your message! We will get back to you soon.');
-            form.reset();
+            contactForm.reset();
         });
     }
 
@@ -132,6 +131,18 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Thank you for your inquiry! A representative will contact you shortly to finalize the details.');
             purchaseForm.reset();
             purchaseFormSection.style.display = 'none';
+        });
+    }
+
+    // Mobile Nav
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (hamburger) {
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            document.body.classList.toggle('no-scroll');
         });
     }
 });
