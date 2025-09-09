@@ -69,8 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBalancesUI();
         alert(`Successfully invested $${amount}!`);
         investModal.style.display = 'none';
-        // Re-render chart with new investment data
-        renderChart();
+        fetchData(true); // Re-fetch to update chart
     }
 
     function handleWithdrawal() {
@@ -84,39 +83,43 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAllUserData(updatedUser);
         updateBalancesUI();
         alert('Investment balance withdrawn successfully!');
-        renderChart();
+        renderChart(); // Re-render chart with 0 balance
     }
 
     // --- UI Rendering ---
-    function renderChart() {
+    function renderChart(coins) {
         chartContainer.innerHTML = '';
-        let seriesData = [];
-        let chartTitle = 'No Active Investments';
-        let yaxisFormatter = (val) => `$${val}`;
-
-        if (loggedInUser.investment_balance > 0) {
-            chartTitle = 'Investment Projection';
-            seriesData = [
-                loggedInUser.investment_balance * 0.98,
-                loggedInUser.investment_balance * 1.02,
-                loggedInUser.investment_balance * 1.01,
-                loggedInUser.investment_balance * 1.05,
-                loggedInUser.investment_balance * 1.03,
-                loggedInUser.investment_balance * 1.08,
-                loggedInUser.investment_balance * 1.12,
-            ];
-            yaxisFormatter = (val) => `$${val.toLocaleString()}`;
+        if (!coins || coins.length === 0 || !coins[0].sparkline_in_7d) {
+            chartContainer.innerHTML = `<p class="no-investments">Market data currently unavailable.</p>`;
+            return;
         }
 
+        const primaryCoin = coins[0];
+        const sparkline = primaryCoin.sparkline_in_7d.price;
+        const minPrice = Math.min(...sparkline);
+        const maxPrice = Math.max(...sparkline);
+        const initialPrice = sparkline[0];
+        const currentPrice = sparkline[sparkline.length - 1];
+        const earnings = (100 / initialPrice) * currentPrice;
+        const earningsText = `A $100 investment 7d ago would be worth ~$${earnings.toFixed(2)} today.`;
+
         const options = {
-            chart: { type: 'area', height: 350, toolbar: { show: false }, zoom: { enabled: false } },
-            series: [{ name: 'Investment Value', data: seriesData }],
-            xaxis: { labels: { style: { colors: '#a0a0a0' } } },
-            yaxis: { labels: { formatter: yaxisFormatter, style: { colors: '#a0a0a0' } } },
-            tooltip: { theme: 'dark' },
-            grid: { borderColor: '#555' },
-            title: { text: chartTitle, align: 'left', style: { color: '#fff', fontSize: '16px' } },
-            noData: { text: 'No active investments to display.' }
+            chart: { type: 'area', height: 350, toolbar: { show: false }, zoom: { enabled: false }, background: 'transparent' },
+            series: [{ name: 'Price (USD)', data: sparkline }],
+            xaxis: { type: 'numeric', labels: { show: false } },
+            yaxis: { labels: { formatter: (val) => `$${val.toLocaleString()}`, style: { colors: '#a0a0a0' } } },
+            tooltip: { theme: 'dark', x: { show: false } },
+            grid: { borderColor: 'rgba(255,255,255,0.1)' },
+            title: { text: `${primaryCoin.name} 7-Day Price Chart`, align: 'left', style: { color: '#fff', fontSize: '16px' } },
+            subtitle: { text: earningsText, align: 'left', style: { color: '#00FFAB', fontSize: '14px' } },
+            fill: { type: "gradient", gradient: { shade: 'dark', type: "vertical", shadeIntensity: 0.5, gradientToColors: ['#00FFAB'], inverseColors: true, opacityFrom: 0.7, opacityTo: 0.3, stops: [0, 90, 100] } },
+            stroke: { curve: 'smooth', width: 2, colors: ['#C147E9'] },
+            annotations: {
+                points: [
+                    { x: sparkline.indexOf(minPrice), y: minPrice, marker: { size: 6, fillColor: '#fff', strokeColor: '#FF4D4D', radius: 2 }, label: { borderColor: '#FF4D4D', text: `7d Low: $${minPrice.toFixed(2)}` } },
+                    { x: sparkline.indexOf(maxPrice), y: maxPrice, marker: { size: 6, fillColor: '#fff', strokeColor: '#00FFAB', radius: 2 }, label: { borderColor: '#00FFAB', text: `7d High: $${maxPrice.toFixed(2)}` } }
+                ]
+            }
         };
         const chart = new ApexCharts(chartContainer, options);
         chart.render();
@@ -141,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <h2>Invest in ${cryptoName}</h2>
             <form id="investment-form">
                 <label for="amount">Amount (USD):</label>
-                <input type="number" id="amount" name="amount" required min="1" max="${loggedInUser.total_account_balance}">
+                <input type="number" id="amount" name="amount" required min="1" max="${loggedInUser.total_account_balance}" placeholder="e.g., 500">
                 <label for="payment-method">Payment Method:</label>
                 <select id="payment-method" name="paymentMethod" required>
                     <option value="crypto">Crypto Wallet</option>
@@ -156,37 +159,46 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('investment-form').addEventListener('submit', handleInvestment);
     }
 
-    async function fetchData() {
+    async function fetchData(isUpdate = false) {
         try {
             const response = await fetch(apiUrl);
             if (!response.ok) throw new Error('API Error');
             const data = await response.json();
-            displayCryptoData(data);
+            if (!isUpdate) { // Only render market list on initial load
+                displayCryptoData(data);
+            }
+            renderChart(data);
         } catch (error) {
             marketContainer.innerHTML = `<p>Could not load market data.</p>`;
+            chartContainer.innerHTML = `<p>Could not load chart data.</p>`;
         }
     }
 
     // --- Initial Setup & Event Listeners ---
-    dropdownFullname.textContent = loggedInUser.fullName;
-    dropdownEmail.textContent = loggedInUser.email;
-    userNavBalance.addEventListener('click', (e) => {
-        e.stopPropagation();
-        userDropdown.style.display = userDropdown.style.display === 'none' ? 'block' : 'none';
-    });
-    logoutBtn.addEventListener('click', () => {
-        sessionStorage.removeItem('loggedInUser');
-        alert('You have been logged out.');
-        window.location.href = 'index.html';
-    });
+    if (userNavBalance) {
+        dropdownFullname.textContent = loggedInUser.fullName;
+        dropdownEmail.textContent = loggedInUser.email;
+        userNavBalance.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.style.display = userDropdown.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('loggedInUser');
+            alert('You have been logged out.');
+            window.location.href = 'index.html';
+        });
+    }
     window.addEventListener('click', () => {
         if (userDropdown && userDropdown.style.display === 'block') {
             userDropdown.style.display = 'none';
         }
     });
-    withdrawBtn.addEventListener('click', handleWithdrawal);
+    if (withdrawBtn) {
+        withdrawBtn.addEventListener('click', handleWithdrawal);
+    }
 
     updateBalancesUI();
-    renderChart();
     fetchData();
 });

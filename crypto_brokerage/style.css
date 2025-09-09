@@ -357,6 +357,19 @@ body.no-scroll {
     transform: rotate(180deg);
 }
 
+/* Make ApexCharts annotations match the theme */
+.apexcharts-point-annotations .apexcharts-marker {
+    stroke-width: 3px;
+}
+.apexcharts-point-annotations .apexcharts-point-annotation-label {
+    border-radius: 5px;
+    padding: 4px 8px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    background-color: var(--secondary-color) !important;
+    color: #fff !important;
+}
+
 .no-investments {
     text-align: center;
     padding: 4rem;
