@@ -357,6 +357,38 @@ body.no-scroll {
     transform: rotate(180deg);
 }
 
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.chart-toggle .toggle-btn {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 5px 15px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.chart-toggle .toggle-btn:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.chart-toggle .toggle-btn:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-left: none;
+}
+
+.chart-toggle .toggle-btn.active {
+    background: var(--accent-color);
+    color: var(--primary-color);
+}
+
 .chart-tooltip {
     padding: 0.5rem 1rem;
     background: var(--primary-color);

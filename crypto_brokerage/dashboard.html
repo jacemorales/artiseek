@@ -29,7 +29,13 @@
 
     <main>
         <section class="dashboard-chart">
-            <h2>Market Overview</h2>
+            <div class="chart-header">
+                <h2>Market Overview</h2>
+                <div class="chart-toggle">
+                    <button id="line-chart-btn" class="toggle-btn active">Line</button>
+                    <button id="bar-chart-btn" class="toggle-btn">Bar</button>
+                </div>
+            </div>
             <div id="chart-container" style="height: 300px;">
                 <!-- Chart will be rendered here -->
             </div>
