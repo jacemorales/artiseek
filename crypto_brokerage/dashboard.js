@@ -90,28 +90,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- UI Rendering ---
     function renderChart() {
         chartContainer.innerHTML = '';
-        if (loggedInUser.investment_balance <= 0) {
-            chartContainer.innerHTML = `<p class="no-investments">No active investments</p>`;
-            return;
+        let seriesData = [];
+        let chartTitle = 'No Active Investments';
+        let yaxisFormatter = (val) => `$${val}`;
+
+        if (loggedInUser.investment_balance > 0) {
+            chartTitle = 'Investment Projection';
+            seriesData = [
+                loggedInUser.investment_balance * 0.98,
+                loggedInUser.investment_balance * 1.02,
+                loggedInUser.investment_balance * 1.01,
+                loggedInUser.investment_balance * 1.05,
+                loggedInUser.investment_balance * 1.03,
+                loggedInUser.investment_balance * 1.08,
+                loggedInUser.investment_balance * 1.12,
+            ];
+            yaxisFormatter = (val) => `$${val.toLocaleString()}`;
         }
-        // For demo, chart shows a fictional projection based on investment balance
-        const seriesData = [
-            loggedInUser.investment_balance * 0.98,
-            loggedInUser.investment_balance * 1.02,
-            loggedInUser.investment_balance * 1.01,
-            loggedInUser.investment_balance * 1.05,
-            loggedInUser.investment_balance * 1.03,
-            loggedInUser.investment_balance * 1.08,
-            loggedInUser.investment_balance * 1.12,
-        ];
+
         const options = {
             chart: { type: 'area', height: 350, toolbar: { show: false }, zoom: { enabled: false } },
             series: [{ name: 'Investment Value', data: seriesData }],
             xaxis: { labels: { style: { colors: '#a0a0a0' } } },
-            yaxis: { labels: { formatter: (val) => `$${val.toLocaleString()}`, style: { colors: '#a0a0a0' } } },
+            yaxis: { labels: { formatter: yaxisFormatter, style: { colors: '#a0a0a0' } } },
             tooltip: { theme: 'dark' },
             grid: { borderColor: '#555' },
-            title: { text: `Investment Projection`, align: 'left', style: { color: '#fff' } },
+            title: { text: chartTitle, align: 'left', style: { color: '#fff', fontSize: '16px' } },
+            noData: { text: 'No active investments to display.' }
         };
         const chart = new ApexCharts(chartContainer, options);
         chart.render();
