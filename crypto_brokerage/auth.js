@@ -95,7 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
             email,
             password,
             phone,
-            acc_bal: 0
+            total_account_balance: 0,
+            investment_balance: 0
         };
 
         users.push(newUser);

@@ -46,20 +46,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateBalancesUI() {
-        userNavBalance.innerHTML = `Balance: $${loggedInUser.total_account_balance.toLocaleString()} <span class="arrow">&#9662;</span>`;
-        investmentBalanceEl.textContent = `$${loggedInUser.investment_balance.toLocaleString()}`;
+        const totalBalance = loggedInUser.total_account_balance || 0;
+        const investmentBalance = loggedInUser.investment_balance || 0;
+        userNavBalance.innerHTML = `Balance: $${totalBalance.toLocaleString()} <span class="arrow">&#9662;</span>`;
+        investmentBalanceEl.textContent = `$${investmentBalance.toLocaleString()}`;
     }
 
     function handleInvestment(e) {
         e.preventDefault();
+        const currentUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
         const amount = parseFloat(e.target.amount.value);
         if (isNaN(amount) || amount <= 0) { return alert('Please enter a valid amount.'); }
-        if (amount > loggedInUser.total_account_balance) { return alert('Insufficient funds.'); }
+        if (amount > currentUser.total_account_balance) { return alert('Insufficient funds.'); }
 
         const updatedUser = {
-            ...loggedInUser,
-            total_account_balance: loggedInUser.total_account_balance - amount,
-            investment_balance: loggedInUser.investment_balance + amount
+            ...currentUser,
+            total_account_balance: currentUser.total_account_balance - amount,
+            investment_balance: currentUser.investment_balance + amount
         };
 
         updateAllUserData(updatedUser);
@@ -71,10 +74,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleWithdrawal() {
-        if (loggedInUser.investment_balance <= 0) { return alert('No funds to withdraw.'); }
+        const currentUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (!currentUser.investment_balance || currentUser.investment_balance <= 0) { return alert('No funds to withdraw.'); }
         const updatedUser = {
-            ...loggedInUser,
-            total_account_balance: loggedInUser.total_account_balance + loggedInUser.investment_balance,
+            ...currentUser,
+            total_account_balance: currentUser.total_account_balance + currentUser.investment_balance,
             investment_balance: 0
         };
         updateAllUserData(updatedUser);
