@@ -88,7 +88,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const primaryCoin = marketData.length > 0 ? marketData[0] : { name: 'Bitcoin' };
 
         let options = {
-            chart: { height: 350, background: 'transparent', toolbar: { show: true, tools: { download: true, selection: true, zoom: true, zoomin: true, zoomout: true, pan: true, reset: true } } },
+            chart: {
+                height: 350,
+                background: 'transparent',
+                toolbar: {
+                    show: true,
+                    tools: {
+                        download: true,
+                        selection: true,
+                        zoom: true,
+                        zoomin: true,
+                        zoomout: true,
+                        pan: false,
+                        reset: false
+                    }
+                }
+            },
             dataLabels: { enabled: false },
             grid: { show: true, borderColor: 'rgba(255,255,255,0.2)', strokeDashArray: 0, yaxis: { lines: { show: true } } },
             tooltip: { enabled: true, theme: 'dark' },
@@ -106,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             options.chart.type = 'area';
             options.series = [{ name: 'Investment Value', data: investmentValueSeries }];
             options.colors = ['#C147E9'];
-            options.stroke = { curve: 'smooth', width: 2 };
+            options.stroke = { curve: 'smooth', width: 2, colors: ['#C147E9'] };
             options.fill = { type: "gradient", gradient: { shade: 'dark', type: "vertical", shadeIntensity: 0.5, gradientToColors: ['#C147E9'], inverseColors: false, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 100] } };
             options.xaxis = { type: 'numeric', labels: { show: false }, axisTicks: { show: false }, axisBorder: { show: false } };
             options.yaxis = { labels: { formatter: (val) => `$${val.toFixed(2)}`, style: { colors: '#a0a0a0' } } };

@@ -382,9 +382,29 @@ body.no-scroll {
     background: transparent;
     border: 1px solid var(--accent-color);
     color: var(--accent-color);
-    padding: 5px 15px;
+    padding: 8px 12px;
     cursor: pointer;
-    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-toggle .toggle-btn svg {
+    fill: var(--accent-color);
+}
+
+.chart-toggle .toggle-btn.active svg {
+    fill: var(--primary-color);
+}
+
+/* Chart Toolbar Styling */
+.apexcharts-toolbar {
+    background: var(--secondary-color) !important;
+    border: 1px solid var(--accent-color) !important;
+    border-radius: 5px;
+}
+.apexcharts-toolbartoolbar-icon svg {
+    fill: var(--text-color) !important;
 }
 
 .chart-toggle .toggle-btn:first-child {
