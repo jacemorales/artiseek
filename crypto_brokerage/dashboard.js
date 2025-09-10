@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const sparkline = ohlcData.map(d => d[4]); // Use closing prices for calculations
+        const sparkline = ohlcData.map(d => d[4]);
         const initialPrice = sparkline[0];
         const investmentValueSeries = sparkline.map(price => (100 / initialPrice) * price * rate);
 
@@ -98,12 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
             chart: {
                 height: 350,
                 background: 'transparent',
-                toolbar: { show: true, tools: { download: true, selection: false, zoom: true, zoomin: true, zoomout: true, pan: false, reset: true } },
+                toolbar: { show: false },
+                zoom: { enabled: false },
+                selection: { enabled: false },
                 events: { dataPointSelection: (e) => e.preventDefault(), click: (e) => e.preventDefault() }
             },
             dataLabels: { enabled: false },
             grid: { show: true, borderColor: 'rgba(255,255,255,0.3)', strokeDashArray: 2, yaxis: { lines: { show: true } } },
             tooltip: { enabled: true, theme: 'dark' },
+            yaxis: { min: 100, labels: { formatter: (val) => `$${val.toFixed(2)}`, style: { colors: '#a0a0a0' } } },
         };
 
         if (currentChartType === 'area') {
@@ -116,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
             options.stroke = { curve: 'smooth', width: 2 };
             options.fill = { type: "gradient", gradient: { shade: 'dark', type: "vertical", shadeIntensity: 0.5, gradientToColors: ['#00FFAB'], inverseColors: false, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 100] } };
             options.xaxis = { type: 'datetime', categories: ohlcData.map(d => d[0]), labels: { style: { colors: '#a0a0a0' } } };
-            options.yaxis = { labels: { formatter: (val) => `$${val.toFixed(2)}`, style: { colors: '#a0a0a0' } } };
             options.tooltip.x = { format: 'dd MMM HH:mm' };
 
         } else if (currentChartType === 'bar') {
@@ -133,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
             options.colors = barColors;
             options.plotOptions = { bar: { columnWidth: '80%', distributed: true } };
             options.xaxis = { type: 'category', categories: investmentValueSeries.map((_, i) => `Day ${Math.floor(i/24)+1}`), labels: { show: false } };
-            options.yaxis = { labels: { formatter: (val) => `$${val.toFixed(2)}`, style: { colors: '#a0a0a0' } } };
             options.legend = { show: false };
         }
 
