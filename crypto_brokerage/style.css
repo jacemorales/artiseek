@@ -357,6 +357,13 @@ body.no-scroll {
     transform: rotate(180deg);
 }
 
+.modal-text {
+    font-style: italic;
+    color: #a0a0a0;
+    text-align: center;
+    margin: 1rem 0;
+}
+
 #chart-title-container {
     padding: 1rem 0;
 }
@@ -553,7 +560,7 @@ body.no-scroll {
     margin: 1rem 0;
 }
 
-.user-dropdown .logout-button {
+.user-dropdown .logout-button, .user-dropdown .top-up-button {
     background: var(--highlight-color);
     color: var(--text-color);
     width: 100%;
@@ -561,6 +568,11 @@ body.no-scroll {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.user-dropdown .top-up-button {
+    background: var(--accent-color);
 }
 
 .hamburger {
