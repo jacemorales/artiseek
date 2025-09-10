@@ -42,17 +42,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('db.json');
             if (!response.ok) throw new Error('Network response was not ok.');
             const data = await response.json();
+            const baseUsers = data.users;
 
-            if (!localStorage.getItem('cryptoUsers')) {
-                localStorage.setItem('cryptoUsers', JSON.stringify(data.users));
-            }
-            users = JSON.parse(localStorage.getItem('cryptoUsers'));
+            const storedUsers = JSON.parse(localStorage.getItem('cryptoUsers')) || [];
+
+            const newUsers = storedUsers.filter(storedUser =>
+                !baseUsers.some(baseUser => baseUser.id === storedUser.id)
+            );
+
+            users = [...baseUsers, ...newUsers];
+            localStorage.setItem('cryptoUsers', JSON.stringify(users));
         } catch (error) {
             console.error('Failed to load user data:', error);
-            // Fallback with demo user if db.json fails
             if (!localStorage.getItem('cryptoUsers')) {
-                users = [{id: 1, fullName: "Demo User", email: "demo@example.com", password: "password123", phone: "123-456-7890", acc_bal: 10000}];
+                users = [{id: 1, fullName: "Demo User", email: "demo@example.com", password: "password123", phone: "123-456-7890", total_account_balance: 10000, investment_balance: 0}];
                 localStorage.setItem('cryptoUsers', JSON.stringify(users));
+            } else {
+                users = JSON.parse(localStorage.getItem('cryptoUsers'));
             }
         }
     }

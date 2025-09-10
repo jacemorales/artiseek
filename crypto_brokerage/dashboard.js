@@ -194,6 +194,12 @@ document.addEventListener('DOMContentLoaded', () => {
             <form id="top-up-form">
                 <label for="top-up-amount">Amount (USD):</label>
                 <input type="number" id="top-up-amount" name="amount" required min="1" placeholder="e.g., 1000">
+                <label for="payment-method">Payment Method:</label>
+                <select id="payment-method" name="paymentMethod" required>
+                    <option value="crypto">Crypto Wallet</option>
+                    <option value="bank">Bank Transfer</option>
+                    <option value="cashapp">Cash App</option>
+                </select>
                 <p class="modal-text">Add to account balance and start making investments now.</p>
                 <button type="submit">Top Up Now</button>
             </form>
