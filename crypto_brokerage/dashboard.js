@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentChartType = 'area';
     let marketData = [];
     let ohlcData = [];
+    let activeChart = null;
     const rate = 1.05;
 
     // --- Route Guard ---
@@ -84,7 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- UI Rendering ---
     function renderChart() {
-        chartContainer.innerHTML = '';
+        if (activeChart) {
+            activeChart.destroy();
+        }
         if (ohlcData.length === 0) {
             chartContainer.innerHTML = `<p class="no-investments">Market chart data currently unavailable.</p>`;
             return;
@@ -98,10 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
             chart: {
                 height: 350,
                 background: 'transparent',
-                toolbar: { show: false },
-                zoom: { enabled: false },
-                selection: { enabled: false },
-                events: { dataPointSelection: (e) => e.preventDefault(), click: (e) => e.preventDefault() }
+                toolbar: { show: true, tools: { download: true, selection: false, zoom: true, zoomin: true, zoomout: true, pan: false, reset: true } },
+                events: { dataPointSelection: (e) => e.preventDefault(), click: (e) => e.preventDefault(), dataPointHover: (e) => e.preventDefault() }
             },
             dataLabels: { enabled: false },
             grid: { show: true, borderColor: 'rgba(255,255,255,0.3)', strokeDashArray: 2, yaxis: { lines: { show: true } } },
@@ -134,12 +135,12 @@ document.addEventListener('DOMContentLoaded', () => {
             options.series = [{ name: 'Investment Value', data: investmentValueSeries }];
             options.colors = barColors;
             options.plotOptions = { bar: { columnWidth: '80%', distributed: true } };
-            options.xaxis = { type: 'category', categories: investmentValueSeries.map((_, i) => `Day ${Math.floor(i/24)+1}`), labels: { show: false } };
+            options.xaxis = { type: 'datetime', categories: ohlcData.map(d => d[0]), labels: { style: { colors: '#a0a0a0' } } };
             options.legend = { show: false };
         }
 
-        const chart = new ApexCharts(chartContainer, options);
-        chart.render();
+        activeChart = new ApexCharts(chartContainer, options);
+        activeChart.render();
     }
 
     function displayCryptoData(coins) {
