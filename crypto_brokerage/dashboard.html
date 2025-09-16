@@ -31,15 +31,7 @@
     <main>
         <section class="dashboard-chart">
             <div class="chart-header">
-                <h2>Market Overview</h2>
-                <div class="chart-toggle">
-                    <button id="line-chart-btn" class="toggle-btn active" title="Line Chart">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"></path></svg>
-                    </button>
-                    <button id="bar-chart-btn" class="toggle-btn" title="Bar Chart">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M4 9h4v11H4zm6-5h4v16h-4zm6 8h4v8h-4z"></path></svg>
-                    </button>
-                </div>
+                <h2>Portfolio Overview</h2>
             </div>
             <div id="chart-title-container">
                 <h3 id="chart-title"></h3>
@@ -50,7 +42,13 @@
             </div>
             <div class="investment-info">
                 <p>Investment Balance: <span id="investment-balance">$0</span></p>
-                <button id="withdraw-btn" class="cta-button">Withdraw Investment</button>
+            </div>
+        </section>
+
+        <section id="investments" class="user-investments">
+            <h2>Your Investments</h2>
+            <div id="investments-list-container">
+                <!-- Investment cards will be rendered here -->
             </div>
         </section>
 

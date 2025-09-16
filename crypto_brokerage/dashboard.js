@@ -13,11 +13,8 @@ function generateCoinSvg(symbol) {
 document.addEventListener('DOMContentLoaded', () => {
     // --- State ---
     let loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    let currentChartType = 'area';
     let marketData = [];
-    let ohlcData = [];
     let activeChart = null;
-    const rate = 1.05;
 
     // --- Route Guard ---
     if (!loggedInUser) {
@@ -34,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logout-btn');
     const topUpBtn = document.getElementById('top-up-btn');
     const investmentBalanceEl = document.getElementById('investment-balance');
-    const withdrawBtn = document.getElementById('withdraw-btn');
     const marketContainer = document.querySelector('.market-container');
     const chartContainer = document.getElementById('chart-container');
     const chartTitleEl = document.getElementById('chart-title');
@@ -43,10 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const investModalContent = document.getElementById('invest-modal-content');
     const topUpModal = document.getElementById('top-up-modal');
     const topUpModalContent = document.getElementById('top-up-modal-content');
-    const lineChartBtn = document.getElementById('line-chart-btn');
-    const barChartBtn = document.getElementById('bar-chart-btn');
+    const investmentsListContainer = document.getElementById('investments-list-container');
     const marketsApiUrl = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1';
-    const ohlcApiUrl = `https://api.coingecko.com/api/v3/coins/bitcoin/ohlc?vs_currency=usd&days=7`;
 
     // --- Core Functions ---
     function updateAllUserData(updatedUser) {
@@ -67,24 +61,47 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleInvestment(e) {
         e.preventDefault();
         const currentUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+
         const amount = parseFloat(e.target.amount.value);
-        if (isNaN(amount) || amount <= 0) { return alert('Please enter a valid amount.'); }
-        if (amount > currentUser.total_account_balance) { return alert('Insufficient funds.'); }
-        const updatedUser = { ...currentUser, total_account_balance: currentUser.total_account_balance - amount, investment_balance: currentUser.investment_balance + amount };
+        const duration = parseInt(e.target.duration.value, 10);
+        const coinName = e.target.dataset.coinName;
+
+        if (isNaN(amount) || amount <= 0) {
+            return alert('Please enter a valid amount.');
+        }
+        if (amount > currentUser.total_account_balance) {
+            return alert('Insufficient funds.');
+        }
+
+        const purchaseDate = new Date();
+        const maturityDate = new Date(purchaseDate);
+        maturityDate.setDate(purchaseDate.getDate() + duration);
+
+        const newInvestment = {
+            id: Date.now(),
+            coinName: coinName,
+            amount: amount,
+            purchaseDate: purchaseDate.toISOString(),
+            duration: duration,
+            maturityDate: maturityDate.toISOString(),
+            status: 'active'
+        };
+
+        const updatedUser = {
+            ...currentUser,
+            total_account_balance: currentUser.total_account_balance - amount,
+            investment_balance: (currentUser.investment_balance || 0) + amount,
+            investments: [...(currentUser.investments || []), newInvestment]
+        };
+
         updateAllUserData(updatedUser);
         updateBalancesUI();
-        alert(`Successfully invested $${amount}!`);
+        renderChart();
+        renderInvestments();
+        alert(`Successfully invested $${amount} in ${coinName} for ${duration} days!`);
         investModal.style.display = 'none';
     }
 
-    function handleWithdrawal() {
-        const currentUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (!currentUser.investment_balance || currentUser.investment_balance <= 0) { return alert('No funds to withdraw.'); }
-        const updatedUser = { ...currentUser, total_account_balance: currentUser.total_account_balance + currentUser.investment_balance, investment_balance: 0 };
-        updateAllUserData(updatedUser);
-        updateBalancesUI();
-        alert('Investment balance withdrawn successfully!');
-    }
 
     function handleTopUp(e) {
         e.preventDefault();
@@ -103,60 +120,131 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeChart) {
             activeChart.destroy();
         }
-        if (ohlcData.length === 0) {
-            chartContainer.innerHTML = `<p class="no-investments">Market chart data currently unavailable.</p>`;
+        chartContainer.innerHTML = ''; // Explicitly clear the container
+
+        const investments = loggedInUser.investments || [];
+        const activeInvestments = investments.filter(inv => inv.status === 'active');
+
+        if (activeInvestments.length === 0) {
+            chartTitleEl.textContent = 'Your Portfolio';
+            chartSubtitleEl.textContent = 'Make an investment to see your portfolio breakdown.';
+            chartContainer.innerHTML = `<p class="no-investments">No active investments to display.</p>`;
             return;
         }
 
-        const sparkline = ohlcData.map(d => d[4]);
-        const initialPrice = sparkline[0];
-        const investmentValueSeries = sparkline.map(price => (100 / initialPrice) * price * rate);
+        const portfolio = activeInvestments.reduce((acc, investment) => {
+            if (!acc[investment.coinName]) {
+                acc[investment.coinName] = 0;
+            }
+            acc[investment.coinName] += investment.amount;
+            return acc;
+        }, {});
 
-        let options = {
-            chart: {
-                height: 350,
-                background: 'transparent',
-                toolbar: { show: true, tools: { download: true, selection: false, zoom: false, zoomin: false, zoomout: false, pan: false, reset: true } },
-                events: { dataPointSelection: (e) => e.preventDefault(), click: (e) => e.preventDefault(), dataPointHover: (e) => e.preventDefault() }
-            },
-            dataLabels: { enabled: false },
-            grid: { show: true, borderColor: 'rgba(255,255,255,0.3)', strokeDashArray: 2, yaxis: { lines: { show: true } } },
-            tooltip: { enabled: true, theme: 'dark' },
-            yaxis: { min: 100, labels: { formatter: (val) => `$${val.toFixed(2)}`, style: { colors: '#a0a0a0' } } },
+        const chartData = Object.values(portfolio);
+        const chartLabels = Object.keys(portfolio);
+
+        chartTitleEl.textContent = 'Your Portfolio Allocation';
+        chartSubtitleEl.textContent = 'Distribution of your total invested capital.';
+
+        const options = {
+            chart: { type: 'pie', height: 350, background: 'transparent', toolbar: { show: true, tools: { download: true } } },
+            series: chartData,
+            labels: chartLabels,
+            colors: ['#00FFAB', '#00E396', '#00D482', '#00C56E', '#00B65A'],
+            legend: { position: 'bottom', labels: { colors: '#a0a0a0' } },
+            responsive: [{ breakpoint: 480, options: { chart: { width: 200 }, legend: { position: 'bottom' } } }]
         };
-
-        if (currentChartType === 'area') {
-            chartTitleEl.textContent = `7-Day Performance of a $100 Investment in CryptoVerse`;
-            chartSubtitleEl.textContent = 'Values include a 1.05x rate multiplier.';
-
-            options.chart.type = 'area';
-            options.series = [{ name: 'Investment Value', data: investmentValueSeries }];
-            options.colors = ['#00FFAB'];
-            options.stroke = { curve: 'smooth', width: 2 };
-            options.fill = { type: "gradient", gradient: { shade: 'dark', type: "vertical", shadeIntensity: 0.5, gradientToColors: ['#00FFAB'], inverseColors: false, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 100] } };
-            options.xaxis = { type: 'datetime', categories: ohlcData.map(d => d[0]), labels: { style: { colors: '#a0a0a0' } } };
-            options.tooltip.x = { format: 'dd MMM HH:mm' };
-
-        } else if (currentChartType === 'bar') {
-            const barColors = investmentValueSeries.map((val, i) => {
-                if (i === 0) return '#808080';
-                return val >= investmentValueSeries[i-1] ? '#00FFAB' : '#FF4D4D';
-            });
-
-            chartTitleEl.textContent = `7-Day Trend of a $100 Investment in CryptoVerse`;
-            chartSubtitleEl.textContent = 'Green bars indicate an increase from the previous data point, red indicates a decrease.';
-
-            options.chart.type = 'bar';
-            options.series = [{ name: 'Investment Value', data: investmentValueSeries }];
-            options.colors = barColors;
-            options.plotOptions = { bar: { columnWidth: '80%', distributed: true } };
-            options.xaxis = { type: 'datetime', categories: ohlcData.map(d => d[0]), labels: { style: { colors: '#a0a0a0' } } };
-            options.legend = { show: false };
-        }
 
         activeChart = new ApexCharts(chartContainer, options);
         activeChart.render();
     }
+
+    function formatTimeRemaining(maturityDate) {
+        const now = new Date();
+        const maturity = new Date(maturityDate);
+        const diff = maturity - now;
+
+        if (diff <= 0) {
+            return '<span class="status-matured">Matured</span>';
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+        return `<span class="status-active">${days}d ${hours}h ${minutes}m remaining</span>`;
+    }
+
+    function renderInvestments() {
+        if (!investmentsListContainer) return;
+
+        const investments = loggedInUser.investments || [];
+        investmentsListContainer.innerHTML = '';
+
+        if (investments.filter(inv => inv.status === 'active').length === 0) {
+            investmentsListContainer.innerHTML = '<p class="no-investments">You have no active investments.</p>';
+            return;
+        }
+
+        investments.forEach(investment => {
+            if (investment.status !== 'active') return;
+
+            const card = document.createElement('div');
+            card.classList.add('investment-card');
+            const now = new Date();
+            const maturity = new Date(investment.maturityDate);
+            const isMatured = now >= maturity;
+
+            card.innerHTML = `
+                <div class="investment-card-header">
+                    <h3>${investment.coinName}</h3>
+                    <p>$${investment.amount.toLocaleString()}</p>
+                </div>
+                <div class="investment-card-body">
+                    <p>Matures on: ${maturity.toLocaleDateString()}</p>
+                    <div class="investment-status">
+                        ${formatTimeRemaining(investment.maturityDate)}
+                    </div>
+                </div>
+                <div class="investment-card-footer">
+                    <button class="btn-withdraw-investment" data-id="${investment.id}" ${!isMatured ? 'disabled' : ''}>
+                        Withdraw
+                    </button>
+                </div>
+            `;
+            investmentsListContainer.appendChild(card);
+        });
+
+        document.querySelectorAll('.btn-withdraw-investment').forEach(button => {
+            button.addEventListener('click', handleSpecificWithdrawal);
+        });
+    }
+
+    function handleSpecificWithdrawal(e) {
+        const investmentId = parseInt(e.target.dataset.id, 10);
+        const currentUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        const investmentIndex = currentUser.investments.findIndex(inv => inv.id === investmentId);
+
+        if (investmentIndex === -1) {
+            return alert('Error: Investment not found.');
+        }
+
+        const investment = currentUser.investments[investmentIndex];
+
+        const updatedUser = {
+            ...currentUser,
+            total_account_balance: currentUser.total_account_balance + investment.amount,
+            investment_balance: currentUser.investment_balance - investment.amount,
+            investments: currentUser.investments.map(inv => inv.id === investmentId ? {...inv, status: 'withdrawn'} : inv)
+        };
+
+        updateAllUserData(updatedUser);
+        updateBalancesUI();
+        renderChart();
+        renderInvestments();
+        alert(`Successfully withdrew $${investment.amount} from your ${investment.coinName} investment.`);
+    }
+
 
     function displayCryptoData(coins) {
         marketContainer.innerHTML = '';
@@ -175,9 +263,20 @@ document.addEventListener('DOMContentLoaded', () => {
         investModalContent.innerHTML = `
             <span class="close-button">&times;</span>
             <h2>Invest in ${cryptoName}</h2>
-            <form id="investment-form">
+            <form id="investment-form" data-coin-name="${cryptoName}">
                 <label for="amount">Amount (USD):</label>
                 <input type="number" id="amount" name="amount" required min="1" max="${loggedInUser.total_account_balance}" placeholder="e.g., 500">
+
+                <label>Investment Duration:</label>
+                <div class="duration-options">
+                    <input type="radio" id="7-days" name="duration" value="7" checked>
+                    <label for="7-days">7 Days</label>
+                    <input type="radio" id="30-days" name="duration" value="30">
+                    <label for="30-days">30 Days</label>
+                    <input type="radio" id="90-days" name="duration" value="90">
+                    <label for="90-days">90 Days</label>
+                </div>
+
                 <p class="modal-text">Invest big invest now and see what the future market holds for u</p>
                 <button type="submit">Finalize Investment</button>
             </form>
@@ -196,9 +295,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <input type="number" id="top-up-amount" name="amount" required min="1" placeholder="e.g., 1000">
                 <label for="payment-method">Payment Method:</label>
                 <select id="payment-method" name="paymentMethod" required>
-                    <option value="crypto">Crypto Wallet</option>
-                    <option value="bank">Bank Transfer</option>
-                    <option value="cashapp">Cash App</option>
+                    <option value="bitcoin">Bitcoin</option>
+                    <option value="tron">Tron</option>
+                    <option value="solana">Solana</option>
+                    <option value="litecoin">Litecoin</option>
+                    <option value="stripe">Stripe</option>
                 </select>
                 <p class="modal-text">Add to account balance and start making investments now.</p>
                 <button type="submit">Top Up Now</button>
@@ -211,12 +312,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchData() {
         try {
-            const [marketsResponse, ohlcResponse] = await Promise.all([ fetch(marketsApiUrl), fetch(ohlcApiUrl) ]);
-            if (!marketsResponse.ok || !ohlcResponse.ok) throw new Error('API Error');
+            const marketsResponse = await fetch(marketsApiUrl);
+            if (!marketsResponse.ok) throw new Error('API Error');
             marketData = await marketsResponse.json();
-            ohlcData = await ohlcResponse.json();
 
             renderChart();
+            renderInvestments();
             displayCryptoData(marketData);
         } catch (error) {
             marketContainer.innerHTML = `<p>Could not load market data.</p>`;
@@ -240,23 +341,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userDropdown && userDropdown.style.display === 'block') { userDropdown.style.display = 'none'; }
         if (e.target == topUpModal) { topUpModal.style.display = 'none'; }
     });
-    if (withdrawBtn) {
-        withdrawBtn.addEventListener('click', handleWithdrawal);
-    }
-    lineChartBtn.addEventListener('click', () => {
-        currentChartType = 'area';
-        lineChartBtn.classList.add('active');
-        barChartBtn.classList.remove('active');
-        renderChart();
-    });
-    barChartBtn.addEventListener('click', () => {
-        currentChartType = 'bar';
-        barChartBtn.classList.add('active');
-        lineChartBtn.classList.remove('active');
-        renderChart();
-    });
 
     // --- Initial Load ---
     updateBalancesUI();
     fetchData();
+    // Set interval to update countdowns
+    setInterval(renderInvestments, 60000); // Update every minute
 });

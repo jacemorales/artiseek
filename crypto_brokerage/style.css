@@ -630,6 +630,135 @@ body.no-scroll {
     font-size: 1.1rem;
 }
 
+/* Investment Section */
+.user-investments {
+    padding: 4rem 0;
+}
+
+.user-investments h2 {
+    font-size: 3rem;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.investments-list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.investment-card {
+    background: rgba(45, 3, 59, 0.4);
+    border: 1px solid var(--accent-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.investment-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+
+.investment-card-header h3 {
+    font-size: 1.8rem;
+    color: var(--highlight-color);
+}
+
+.investment-card-header p {
+    font-size: 1.5rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.investment-card-body p {
+    color: #a0a0a0;
+    margin-bottom: 0.5rem;
+}
+
+.investment-status {
+    font-weight: 700;
+    margin-top: 1rem;
+}
+
+.status-matured {
+    color: var(--green);
+}
+
+.status-active {
+    color: var(--text-color);
+}
+
+.investment-card-footer {
+    margin-top: 1.5rem;
+}
+
+.btn-withdraw-investment {
+    width: 100%;
+    padding: 12px;
+    background: var(--green);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    transition: background 0.3s ease;
+}
+
+.btn-withdraw-investment:hover:not(:disabled) {
+    background: #00e6a1;
+}
+
+.btn-withdraw-investment:disabled {
+    background: #555;
+    color: #888;
+    cursor: not-allowed;
+}
+
+
+/* Duration Radio Buttons in Modal */
+.duration-options {
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+}
+
+.duration-options input[type="radio"] {
+    display: none; /* Hide original radio button */
+}
+
+.duration-options label {
+    flex: 1;
+    text-align: center;
+    padding: 10px 15px;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.duration-options label:first-of-type {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.duration-options label:last-of-type {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-left: none;
+}
+
+.duration-options input[type="radio"]:checked + label {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+}
+
+
 /* All Mobile Styles Last */
 @media screen and (max-width: 768px) {
     .hero-content h1 { font-size: 2.5rem; }
