@@ -1,75 +1,69 @@
-function generateCoinSvg(symbol) {
-    const cleanSymbol = symbol.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-            <defs><radialGradient id="grad-${cleanSymbol}" cx="50%" cy="50%" r="50%" fx="50%" fy="50%"><stop offset="0%" style="stop-color:#e94560;stop-opacity:0.5" /><stop offset="100%" style="stop-color:#0f3460;stop-opacity:1" /></radialGradient></defs>
-            <circle cx="50" cy="50" r="50" fill="url(#grad-${cleanSymbol})" />
-            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#f0f0f0" font-size="30" font-family="Roboto, sans-serif" font-weight="bold">${cleanSymbol}</text>
-        </svg>
-    `;
-    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
+import ApexCharts from 'apexcharts';
+import { User, Coin, Investment } from './types';
 
-document.addEventListener('DOMContentLoaded', () => {
-    // --- State ---
-    let loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    let marketData = [];
-    let activeChart = null;
+// --- State ---
+let loggedInUser: User | null = JSON.parse(sessionStorage.getItem('loggedInUser') || 'null');
+let marketData: Coin[] = [];
+let activeChart: ApexCharts | null = null;
 
-    // --- Route Guard ---
-    if (!loggedInUser) {
-        alert('You must be logged in to view this page.');
-        window.location.href = 'index.html';
-        return;
-    }
-
+// --- Route Guard ---
+if (!loggedInUser) {
+    alert('You must be logged in to view this page.');
+    window.location.href = 'index.html';
+} else {
     // --- DOM Elements ---
-    const userNavBalance = document.getElementById('user-nav-balance');
-    const userDropdown = document.getElementById('user-dropdown');
-    const dropdownFullname = document.getElementById('dropdown-fullname');
-    const dropdownEmail = document.getElementById('dropdown-email');
-    const logoutBtn = document.getElementById('logout-btn');
-    const topUpBtn = document.getElementById('top-up-btn');
-    const investmentBalanceEl = document.getElementById('investment-balance');
-    const marketContainer = document.querySelector('.market-container');
-    const chartContainer = document.getElementById('chart-container');
-    const chartTitleEl = document.getElementById('chart-title');
-    const chartSubtitleEl = document.getElementById('chart-subtitle');
-    const investModal = document.getElementById('invest-modal');
-    const investModalContent = document.getElementById('invest-modal-content');
-    const topUpModal = document.getElementById('top-up-modal');
-    const topUpModalContent = document.getElementById('top-up-modal-content');
-    const investmentsListContainer = document.getElementById('investments-list-container');
+    const userNavBalance = document.getElementById('user-nav-balance') as HTMLElement | null;
+    const userDropdown = document.getElementById('user-dropdown') as HTMLElement | null;
+    const dropdownFullname = document.getElementById('dropdown-fullname') as HTMLElement | null;
+    const dropdownEmail = document.getElementById('dropdown-email') as HTMLElement | null;
+    const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement | null;
+    const topUpBtn = document.getElementById('top-up-btn') as HTMLButtonElement | null;
+    const investmentBalanceEl = document.getElementById('investment-balance') as HTMLElement | null;
+    const marketContainer = document.querySelector('.market-container') as HTMLElement | null;
+    const chartContainer = document.getElementById('chart-container') as HTMLElement | null;
+    const chartTitleEl = document.getElementById('chart-title') as HTMLElement | null;
+    const chartSubtitleEl = document.getElementById('chart-subtitle') as HTMLElement | null;
+    const investModal = document.getElementById('invest-modal') as HTMLDivElement | null;
+    const investModalContent = document.getElementById('invest-modal-content') as HTMLDivElement | null;
+    const topUpModal = document.getElementById('top-up-modal') as HTMLDivElement | null;
+    const topUpModalContent = document.getElementById('top-up-modal-content') as HTMLDivElement | null;
+    const investmentsListContainer = document.getElementById('investments-list-container') as HTMLElement | null;
     const marketsApiUrl = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1';
 
     // --- Core Functions ---
-    function updateAllUserData(updatedUser) {
+    function updateAllUserData(updatedUser: User): void {
         sessionStorage.setItem('loggedInUser', JSON.stringify(updatedUser));
-        let allUsers = JSON.parse(localStorage.getItem('cryptoUsers'));
+        let allUsers: User[] = JSON.parse(localStorage.getItem('cryptoUsers') || '[]');
         const userIndex = allUsers.findIndex(u => u.id === updatedUser.id);
-        if (userIndex !== -1) { allUsers[userIndex] = updatedUser; localStorage.setItem('cryptoUsers', JSON.stringify(allUsers)); }
+        if (userIndex !== -1) {
+            allUsers[userIndex] = updatedUser;
+            localStorage.setItem('cryptoUsers', JSON.stringify(allUsers));
+        }
         loggedInUser = updatedUser;
     }
 
-    function updateBalancesUI() {
+    function updateBalancesUI(): void {
+        if (!loggedInUser || !userNavBalance || !investmentBalanceEl) return;
         const totalBalance = loggedInUser.total_account_balance || 0;
         const investmentBalance = loggedInUser.investment_balance || 0;
         userNavBalance.innerHTML = `Balance: $${totalBalance.toLocaleString()} <span class="arrow">&#9662;</span>`;
         investmentBalanceEl.textContent = `$${investmentBalance.toLocaleString()}`;
     }
 
-    function handleInvestment(e) {
+    function handleInvestment(e: SubmitEvent): void {
         e.preventDefault();
-        const currentUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (!loggedInUser) return;
 
-        const amount = parseFloat(e.target.amount.value);
-        const duration = parseInt(e.target.duration.value, 10);
-        const coinName = e.target.dataset.coinName;
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
+        const amount = parseFloat(formData.get('amount') as string);
+        const duration = parseInt(formData.get('duration') as string, 10);
+        const coinName = form.dataset.coinName || 'Unknown Coin';
 
         if (isNaN(amount) || amount <= 0) {
             return alert('Please enter a valid amount.');
         }
-        if (amount > currentUser.total_account_balance) {
+        if (amount > loggedInUser.total_account_balance) {
             return alert('Insufficient funds.');
         }
 
@@ -77,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const maturityDate = new Date(purchaseDate);
         maturityDate.setDate(purchaseDate.getDate() + duration);
 
-        const newInvestment = {
+        const newInvestment: Investment = {
             id: Date.now(),
             coinName: coinName,
             amount: amount,
@@ -87,11 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
             status: 'active'
         };
 
-        const updatedUser = {
-            ...currentUser,
-            total_account_balance: currentUser.total_account_balance - amount,
-            investment_balance: (currentUser.investment_balance || 0) + amount,
-            investments: [...(currentUser.investments || []), newInvestment]
+        const updatedUser: User = {
+            ...loggedInUser,
+            total_account_balance: loggedInUser.total_account_balance - amount,
+            investment_balance: (loggedInUser.investment_balance || 0) + amount,
+            investments: [...(loggedInUser.investments || []), newInvestment]
         };
 
         updateAllUserData(updatedUser);
@@ -99,28 +93,34 @@ document.addEventListener('DOMContentLoaded', () => {
         renderChart();
         renderInvestments();
         alert(`Successfully invested $${amount} in ${coinName} for ${duration} days!`);
-        investModal.style.display = 'none';
+        if (investModal) investModal.style.display = 'none';
     }
 
-
-    function handleTopUp(e) {
+    function handleTopUp(e: SubmitEvent): void {
         e.preventDefault();
-        const currentUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        const amount = parseFloat(e.target.amount.value);
+        if (!loggedInUser) return;
+
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
+        const amount = parseFloat(formData.get('amount') as string);
+
         if (isNaN(amount) || amount <= 0) { return alert('Please enter a valid amount.'); }
-        const updatedUser = { ...currentUser, total_account_balance: currentUser.total_account_balance + amount };
+
+        const updatedUser: User = { ...loggedInUser, total_account_balance: loggedInUser.total_account_balance + amount };
         updateAllUserData(updatedUser);
         updateBalancesUI();
         alert(`Successfully topped up $${amount}!`);
-        topUpModal.style.display = 'none';
+        if (topUpModal) topUpModal.style.display = 'none';
     }
 
     // --- UI Rendering ---
-    function renderChart() {
+    function renderChart(): void {
+        if (!loggedInUser || !chartContainer || !chartTitleEl || !chartSubtitleEl) return;
+
         if (activeChart) {
             activeChart.destroy();
         }
-        chartContainer.innerHTML = ''; // Explicitly clear the container
+        chartContainer.innerHTML = '';
 
         const investments = loggedInUser.investments || [];
         const activeInvestments = investments.filter(inv => inv.status === 'active');
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             acc[investment.coinName] += investment.amount;
             return acc;
-        }, {});
+        }, {} as Record<string, number>);
 
         const chartData = Object.values(portfolio);
         const chartLabels = Object.keys(portfolio);
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chartTitleEl.textContent = 'Your Portfolio Allocation';
         chartSubtitleEl.textContent = 'Distribution of your total invested capital.';
 
-        const options = {
+        const options: ApexCharts.ApexOptions = {
             chart: { type: 'pie', height: 350, background: 'transparent', toolbar: { show: true, tools: { download: true } } },
             series: chartData,
             labels: chartLabels,
@@ -159,10 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
         activeChart.render();
     }
 
-    function formatTimeRemaining(maturityDate) {
+    function formatTimeRemaining(maturityDate: string): string {
         const now = new Date();
         const maturity = new Date(maturityDate);
-        const diff = maturity - now;
+        const diff = maturity.getTime() - now.getTime();
 
         if (diff <= 0) {
             return '<span class="status-matured">Matured</span>';
@@ -175,8 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return `<span class="status-active">${days}d ${hours}h ${minutes}m remaining</span>`;
     }
 
-    function renderInvestments() {
-        if (!investmentsListContainer) return;
+    function renderInvestments(): void {
+        if (!investmentsListContainer || !loggedInUser) return;
 
         const investments = loggedInUser.investments || [];
         investmentsListContainer.innerHTML = '';
@@ -216,26 +216,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.querySelectorAll('.btn-withdraw-investment').forEach(button => {
-            button.addEventListener('click', handleSpecificWithdrawal);
+            button.addEventListener('click', handleSpecificWithdrawal as EventListener);
         });
     }
 
-    function handleSpecificWithdrawal(e) {
-        const investmentId = parseInt(e.target.dataset.id, 10);
-        const currentUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        const investmentIndex = currentUser.investments.findIndex(inv => inv.id === investmentId);
+    function handleSpecificWithdrawal(e: Event): void {
+        if (!loggedInUser) return;
+        const target = e.target as HTMLButtonElement;
+        const investmentId = parseInt(target.dataset.id || '0', 10);
 
-        if (investmentIndex === -1) {
+        const investmentIndex = loggedInUser.investments?.findIndex(inv => inv.id === investmentId);
+
+        if (investmentIndex === undefined || investmentIndex === -1 || !loggedInUser.investments) {
             return alert('Error: Investment not found.');
         }
 
-        const investment = currentUser.investments[investmentIndex];
+        const investment = loggedInUser.investments[investmentIndex];
 
-        const updatedUser = {
-            ...currentUser,
-            total_account_balance: currentUser.total_account_balance + investment.amount,
-            investment_balance: currentUser.investment_balance - investment.amount,
-            investments: currentUser.investments.map(inv => inv.id === investmentId ? {...inv, status: 'withdrawn'} : inv)
+        const updatedUser: User = {
+            ...loggedInUser,
+            total_account_balance: loggedInUser.total_account_balance + investment.amount,
+            investment_balance: loggedInUser.investment_balance - investment.amount,
+            investments: loggedInUser.investments.map(inv => inv.id === investmentId ? {...inv, status: 'withdrawn'} : inv)
         };
 
         updateAllUserData(updatedUser);
@@ -245,21 +247,35 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`Successfully withdrew $${investment.amount} from your ${investment.coinName} investment.`);
     }
 
+    function generateCoinSvg(symbol: string): string {
+        const cleanSymbol = symbol.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        const svg = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <defs><radialGradient id="grad-${cleanSymbol}" cx="50%" cy="50%" r="50%" fx="50%" fy="50%"><stop offset="0%" style="stop-color:#e94560;stop-opacity:0.5" /><stop offset="100%" style="stop-color:#0f3460;stop-opacity:1" /></radialGradient></defs>
+                <circle cx="50" cy="50" r="50" fill="url(#grad-${cleanSymbol})" />
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#f0f0f0" font-size="30" font-family="Roboto, sans-serif" font-weight="bold">${cleanSymbol}</text>
+            </svg>
+        `;
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    }
 
-    function displayCryptoData(coins) {
+    function displayCryptoData(coins: Coin[]): void {
+        if (!marketContainer) return;
         marketContainer.innerHTML = '';
         coins.forEach((coin, index) => {
             const cryptoCard = document.createElement('div');
             cryptoCard.classList.add('crypto-card');
-            cryptoCard.style.setProperty('--card-index', index);
+            cryptoCard.style.setProperty('--card-index', index.toString());
             cryptoCard.innerHTML = `<div class="card-header"><img src="${generateCoinSvg(coin.symbol)}" alt="${coin.name} logo"><div class="name-symbol"><h3>${coin.name}</h3><p>${coin.symbol.toUpperCase()}</p></div></div><div class="card-body"><p class="price">$${coin.current_price.toLocaleString()}</p></div><button class="btn-invest" data-name="${coin.name}">Invest</button>`;
             marketContainer.appendChild(cryptoCard);
         });
-        document.querySelectorAll('.btn-invest').forEach(button => button.addEventListener('click', openInvestModal));
+        document.querySelectorAll('.btn-invest').forEach(button => button.addEventListener('click', openInvestModal as EventListener));
     }
 
-    function openInvestModal(event) {
-        const cryptoName = event.target.dataset.name;
+    function openInvestModal(event: MouseEvent): void {
+        if (!loggedInUser || !investModal || !investModalContent) return;
+        const target = event.target as HTMLButtonElement;
+        const cryptoName = target.dataset.name;
         investModalContent.innerHTML = `
             <span class="close-button">&times;</span>
             <h2>Invest in ${cryptoName}</h2>
@@ -282,11 +298,12 @@ document.addEventListener('DOMContentLoaded', () => {
             </form>
         `;
         investModal.style.display = 'flex';
-        investModalContent.querySelector('.close-button').addEventListener('click', () => investModal.style.display = 'none');
-        document.getElementById('investment-form').addEventListener('submit', handleInvestment);
+        investModalContent.querySelector('.close-button')?.addEventListener('click', () => {if(investModal) investModal.style.display = 'none'});
+        document.getElementById('investment-form')?.addEventListener('submit', handleInvestment as EventListener);
     }
 
-    function openTopUpModal() {
+    function openTopUpModal(): void {
+        if (!topUpModal || !topUpModalContent) return;
         topUpModalContent.innerHTML = `
             <span class="close-button">&times;</span>
             <h2>Top Up Balance</h2>
@@ -306,11 +323,11 @@ document.addEventListener('DOMContentLoaded', () => {
             </form>
         `;
         topUpModal.style.display = 'flex';
-        topUpModalContent.querySelector('.close-button').addEventListener('click', () => topUpModal.style.display = 'none');
-        document.getElementById('top-up-form').addEventListener('submit', handleTopUp);
+        topUpModalContent.querySelector('.close-button')?.addEventListener('click', () => {if(topUpModal) topUpModal.style.display = 'none'});
+        document.getElementById('top-up-form')?.addEventListener('submit', handleTopUp as EventListener);
     }
 
-    async function fetchData() {
+    async function fetchData(): Promise<void> {
         try {
             const marketsResponse = await fetch(marketsApiUrl);
             if (!marketsResponse.ok) throw new Error('API Error');
@@ -320,31 +337,44 @@ document.addEventListener('DOMContentLoaded', () => {
             renderInvestments();
             displayCryptoData(marketData);
         } catch (error) {
-            marketContainer.innerHTML = `<p>Could not load market data.</p>`;
-            chartContainer.innerHTML = `<p class="no-investments">Could not load chart data.</p>`;
+            if(marketContainer) marketContainer.innerHTML = `<p>Could not load market data.</p>`;
+            if(chartContainer) chartContainer.innerHTML = `<p class="no-investments">Could not load chart data.</p>`;
         }
     }
 
     // --- Event Listeners ---
-    if (userNavBalance) {
+    if (userNavBalance && dropdownFullname && dropdownEmail) {
         dropdownFullname.textContent = loggedInUser.fullName;
         dropdownEmail.textContent = loggedInUser.email;
-        userNavBalance.addEventListener('click', (e) => { e.stopPropagation(); userDropdown.style.display = userDropdown.style.display === 'none' ? 'block' : 'none'; });
+        userNavBalance.addEventListener('click', (e: MouseEvent) => {
+            e.stopPropagation();
+            if(userDropdown) userDropdown.style.display = userDropdown.style.display === 'none' ? 'block' : 'none';
+        });
     }
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); alert('You have been logged out.'); window.location.href = 'index.html'; });
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('loggedInUser');
+            alert('You have been logged out.');
+            window.location.href = 'index.html';
+        });
     }
     if (topUpBtn) {
         topUpBtn.addEventListener('click', openTopUpModal);
     }
-    window.addEventListener('click', (e) => {
-        if (userDropdown && userDropdown.style.display === 'block') { userDropdown.style.display = 'none'; }
-        if (e.target == topUpModal) { topUpModal.style.display = 'none'; }
+    window.addEventListener('click', (e: MouseEvent) => {
+        if (userDropdown && userDropdown.style.display === 'block') {
+            userDropdown.style.display = 'none';
+        }
+        if (e.target === topUpModal) {
+            if(topUpModal) topUpModal.style.display = 'none';
+        }
+        if (e.target === investModal) {
+            if(investModal) investModal.style.display = 'none';
+        }
     });
 
     // --- Initial Load ---
     updateBalancesUI();
     fetchData();
-    // Set interval to update countdowns
-    setInterval(renderInvestments, 60000); // Update every minute
-});
+    setInterval(renderInvestments, 60000);
+}
